@@ -1,5 +1,5 @@
 # apps/devices/views.py
-
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -47,3 +47,17 @@ class DeviceViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'status': 'location recorded'}, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(tags=['Devices'], operation_summary="Регистрация нового устройства")
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @swagger_auto_schema(tags=['Devices'], operation_summary="Обновление статуса устройства")
+    @action(detail=True, methods=['patch'], serializer_class=DeviceStatusUpdateSerializer)
+    def status(self, request, device_uid=None):
+        return super().status(request, device_uid)
+
+    @swagger_auto_schema(tags=['Devices'], operation_summary="Запись местоположения устройства")
+    @action(detail=True, methods=['post'], serializer_class=LocationTrackSerializer)
+    def location(self, request, device_uid=None):
+        return super().location(request, device_uid)

@@ -1,5 +1,5 @@
 # apps/users/views.py
-
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -33,3 +33,11 @@ class RegisterView(generics.CreateAPIView):
             "access": str(refresh.access_token),
             "refresh": str(refresh),
         }, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        tags=['Auth'],
+        operation_summary="Регистрация нового пользователя",
+        operation_description="Создает нового пользователя и возвращает пару access/refresh токенов."
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)

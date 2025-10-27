@@ -1,5 +1,5 @@
 # apps/sos/views.py
-
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -30,3 +30,12 @@ class SOSEventViewSet(viewsets.GenericViewSet):
             "event_uid": event.event_uid,
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        tags=['SOS'],
+        operation_summary="Триггер SOS-события",
+        operation_description="Принимает сигнал SOS от устройства или приложения, выполняет дедупликацию и запускает процесс оповещения."
+    )
+    @action(detail=False, methods=['post'], serializer_class=SOSEventTriggerSerializer)
+    def trigger(self, request):
+        return super().trigger(request)
