@@ -21,6 +21,7 @@ urlpatterns = [
     path('api/v1/', include([
         # Сюда будем добавлять URL-ы наших приложений
         path('auth/', include('apps.users.urls')),
+        path('devices/', include('apps.devices.urls')),
     ])),
 
     # Документация API
