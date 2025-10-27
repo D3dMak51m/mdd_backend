@@ -12,3 +12,4 @@ uvicorn==0.38.0
 django-cors-headers==4.9.0
 django-prometheus==2.4.1
 django-celery-beat==2.8.1
+firebase-admin==7.1.0

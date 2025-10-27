@@ -175,3 +175,24 @@ if SENTRY_DSN:
         traces_sample_rate=1.0,
         send_default_pii=True
     )
+
+    import firebase_admin
+    from firebase_admin import credentials
+    import json
+
+    FCM_SERVICE_ACCOUNT_JSON = env('FCM_SERVICE_ACCOUNT_JSON', default=None)
+
+    if FCM_SERVICE_ACCOUNT_JSON and not firebase_admin._apps:
+        try:
+            # Если переменная содержит путь к файлу
+            if os.path.exists(FCM_SERVICE_ACCOUNT_JSON):
+                cred = credentials.Certificate(FCM_SERVICE_ACCOUNT_JSON)
+            else:
+                # Если переменная содержит JSON-строку
+                cred_json = json.loads(FCM_SERVICE_ACCOUNT_JSON)
+                cred = credentials.Certificate(cred_json)
+
+            firebase_admin.initialize_app(cred)
+            print("Firebase Admin SDK инициализирован успешно.")
+        except Exception as e:
+            print(f"Ошибка инициализации Firebase Admin SDK: {e}")
