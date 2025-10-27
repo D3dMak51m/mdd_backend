@@ -1,10 +1,11 @@
-# mdd_backend/urls.py
+# mdd_backend/urls.py (ОКОНЧАТЕЛЬНО ИСПРАВЛЕННАЯ ВЕРСИЯ)
 
 from django.contrib import admin
 from django.urls import path, include
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+from django_prometheus.exports import ExportToDjangoView  # Импорт остается
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -18,11 +19,16 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Эндпоинт для метрик Prometheus (прямая передача функции)
+    path('metrics/', ExportToDjangoView, name='prometheus-django-metrics'),  # <-- ИСПРАВЛЕНО ЗДЕСЬ
+
+    # Все эндпоинты нашего API с префиксом /api/v1/
     path('api/v1/', include([
-        # Сюда будем добавлять URL-ы наших приложений
         path('auth/', include('apps.users.urls')),
         path('devices/', include('apps.devices.urls')),
         path('sos/', include('apps.sos.urls')),
+        path('monitoring/', include('apps.monitoring.urls')),
     ])),
 
     # Документация API

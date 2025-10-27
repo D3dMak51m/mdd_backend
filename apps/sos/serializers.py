@@ -11,7 +11,7 @@ from .consumers import DispatcherConsumer
 from .models import SOSEvent
 from apps.devices.models import Device
 from .tasks import notify_nearby_helpers, escalation_watch
-
+from django_prometheus.models import model_deletes, model_inserts, model_updates
 
 class SOSEventTriggerSerializer(serializers.Serializer):
     device_uid = serializers.CharField(max_length=100)
@@ -68,6 +68,8 @@ class SOSEventTriggerSerializer(serializers.Serializer):
             dedup_hash=dedup_hash
         )
 
+        model_inserts.labels(model=SOSEvent._meta.model_name).inc()
+
         # 4. Запускаем фоновые задачи
         notify_nearby_helpers.delay(event.id)
         escalation_watch.apply_async(args=[event.id], countdown=300)
@@ -105,3 +107,4 @@ class SOSEventSerializer(serializers.ModelSerializer):
 
     def get_lon(self, obj):
         return obj.latlon.x
+
