@@ -7,13 +7,13 @@ from drf_yasg import openapi
 from rest_framework import permissions
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="MDD Backend API",
-      default_version='v1',
-      description="API documentation for the MDD project",
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    openapi.Info(
+        title="MDD Backend API",
+        default_version='v1',
+        description="API documentation for the MDD project",
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
@@ -22,6 +22,7 @@ urlpatterns = [
         # Сюда будем добавлять URL-ы наших приложений
         path('auth/', include('apps.users.urls')),
         path('devices/', include('apps.devices.urls')),
+        path('sos/', include('apps.sos.urls')),
     ])),
 
     # Документация API
