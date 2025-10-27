@@ -8,8 +8,8 @@ ENV PYTHONUNBUFFERED 1
 # Установить рабочую директорию
 WORKDIR /app
 
-# Установить системные зависимости для psycopg2
-RUN apt-get update && apt-get install -y gcc libpq-dev
+# Установить системные зависимости для psycopg2 и PostGIS (GDAL)
+RUN apt-get update && apt-get install -y gcc libpq-dev libgdal-dev gdal-bin
 
 # Установить зависимости Python
 COPY requirements.txt /app/
