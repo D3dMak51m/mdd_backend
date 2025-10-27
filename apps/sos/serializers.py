@@ -1,12 +1,13 @@
 # apps/sos/serializers.py
-
 import hashlib
 import math
-from datetime import datetime, timedelta, timezone
-
+from datetime import timedelta
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from rest_framework import serializers
 from django.contrib.gis.geos import Point
 
+from .consumers import DispatcherConsumer
 from .models import SOSEvent
 from apps.devices.models import Device
 from .tasks import notify_nearby_helpers, escalation_watch
@@ -69,14 +70,38 @@ class SOSEventTriggerSerializer(serializers.Serializer):
 
         # 4. Запускаем фоновые задачи
         notify_nearby_helpers.delay(event.id)
-        # Задача эскалации через 5 минут (300 секунд)
         escalation_watch.apply_async(args=[event.id], countdown=300)
 
-        # Возвращаем новое событие и флаг True (создано)
+        # 5. Отправляем событие в WebSocket-группу (НОВОЕ)
+        channel_layer = get_channel_layer()
+        event_data = SOSEventSerializer(event).data
+
+        async_to_sync(channel_layer.group_send)(
+            DispatcherConsumer.GROUP_NAME,
+            {
+                'type': 'sos.event.broadcast',  # Это имя вызовет метод sos_event_broadcast в consumer
+                'payload': event_data
+            }
+        )
+
         return event, True
 
 
 class SOSEventSerializer(serializers.ModelSerializer):
+    device_uid = serializers.CharField(source='device.device_uid', read_only=True)
+    user_phone = serializers.CharField(source='user.phone_number', read_only=True)
+    lat = serializers.SerializerMethodField()
+    lon = serializers.SerializerMethodField()
+
     class Meta:
         model = SOSEvent
-        fields = ('event_uid', 'timestamp', 'resolved')
+        fields = (
+            'event_uid', 'timestamp', 'resolved', 'detected_type', 'severity',
+            'device_uid', 'user_phone', 'lat', 'lon'
+        )
+
+    def get_lat(self, obj):
+        return obj.latlon.y
+
+    def get_lon(self, obj):
+        return obj.latlon.x
