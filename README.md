@@ -132,7 +132,8 @@ curl --location 'http://localhost/api/v1/auth/login/' \
 --data '{
     "phone_number": "+998901234567",
     "password": "password123"
-}'```
+}'
+```
 
 **Регистрация устройства:**
 ```curl
