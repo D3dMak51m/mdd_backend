@@ -383,7 +383,8 @@ volumes:
 Скрипт `scripts/backup_pg.sh` создает сжатый дамп базы данных. В продакшен-среде его следует запускать по расписанию (`cron`).
 ```bash
 # Пример ручного запуска
-docker-compose exec -e POSTGRES_PASSWORD=your_prod_password web sh -c "dos2unix /app/scripts/backup_pg.sh && /app/scripts/backup_pg.sh"```
+docker-compose exec -e POSTGRES_PASSWORD=your_prod_password web sh -c "dos2unix /app/scripts/backup_pg.sh && /app/scripts/backup_pg.sh"
+```
 
 ### Восстановление из бэкапа
 **ВНИМАНИЕ: Эта команда перезапишет существующие данные в базе.**
