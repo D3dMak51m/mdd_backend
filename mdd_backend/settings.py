@@ -141,11 +141,11 @@ SIMPLE_JWT = {
 }
 
 # CORS
-CORS_ALLOW_ALL_ORIGINS = True # Для разработки. В продакшене заменить на CORS_ALLOWED_ORIGINS
+CORS_ALLOW_ALL_ORIGINS = True  # Для разработки. В продакшене заменить на CORS_ALLOWED_ORIGINS
 
 # Celery
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://redis:6379/0')
-CELERY_RESULT_BACKEND = env('CELERY_BROKER_URL') # Можно использовать тот же Redis
+CELERY_RESULT_BACKEND = env('CELERY_BROKER_URL')  # Можно использовать тот же Redis
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -196,3 +196,16 @@ if SENTRY_DSN:
             print("Firebase Admin SDK инициализирован успешно.")
         except Exception as e:
             print(f"Ошибка инициализации Firebase Admin SDK: {e}")
+
+# Настройка для drf-yasg для подавления DeprecationWarning
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Введите "Bearer {токен}"'
+        }
+    }
+}
