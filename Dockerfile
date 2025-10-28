@@ -1,3 +1,5 @@
+# Dockerfile (ИСПРАВЛЕННАЯ ВЕРСИЯ)
+
 # Использовать официальный образ Python
 FROM python:3.12-slim
 
@@ -18,7 +20,9 @@ RUN apt-get update && \
     libgdal-dev \
     gdal-bin \
     gcc \
-    libpq-dev && \
+    libpq-dev \
+    postgresql-client \
+    dos2unix && \
     rm -rf /var/lib/apt/lists/*
 
 # Установить зависимости Python
