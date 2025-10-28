@@ -1,0 +1,68 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd "pg_isready -U test_user -d test_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7.2-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gdal-bin libgdal-dev binutils libproj-dev
+
+    - name: Install Python dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+
+    - name: Run tests
+      env:
+        # Используем переменные окружения для подключения к сервисам БД и Redis
+        DATABASE_URL: postgis://test_user:test_password@localhost:5432/test_db
+        CELERY_BROKER_URL: redis://localhost:6379/0
+        CACHE_URL: redis://localhost:6379/1
+        DJANGO_SECRET_KEY: a-test-secret-key-for-ci
+        DEBUG: True
+        DJANGO_ALLOWED_HOSTS: localhost
+      run: |
+        python manage.py migrate
+        pytest
