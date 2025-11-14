@@ -1,23 +1,21 @@
-# render.yaml (ИСПРАВЛЕННАЯ ВЕРСИЯ)
-
-services:
-  # База данных PostGIS
-  - type: postgres
-    name: mdd-db
-    postgresMajorVersion: 16
-    ipAllowList: [] # Доступ из любого места
+databases:
+  - name: mdd-db
+    databaseName: mdd
+    user: mdd
     plan: free
+    postgresMajorVersion: 16
+    ipAllowList: []
     extensions:
       - name: postgis
 
+services:
   # Redis
   - type: redis
     name: mdd-redis
     ipAllowList: []
     plan: free
-    plan: free
 
-  # Веб-сервис Django
+  # Django Web Service
   - type: web
     name: mdd-web
     env: docker
@@ -27,25 +25,27 @@ services:
     healthCheck:
       path: /admin/login/
       initialDelaySeconds: 60
+
     envVars:
       - key: DATABASE_URL
-        fromService:
-          type: postgres
+        fromDatabase:
           name: mdd-db
           property: connectionString
+
       - key: CELERY_BROKER_URL
         fromService:
-          type: redis
           name: mdd-redis
+          type: redis
           property: connectionString
+
       - key: CACHE_URL
         fromService:
-          type: redis
           name: mdd-redis
+          type: redis
           property: connectionString
-      - fromGroup: common-env # Группа переменных ниже
 
-    # Команда, которая выполняется при каждом развертывании
+      - fromGroup: common-env
+
     initialDeployHook: |
       python manage.py migrate
       python manage.py collectstatic --no-input
@@ -72,7 +72,6 @@ services:
     envVars:
       - fromGroup: common-env
 
-# Общие переменные окружения
 envVarGroups:
   - name: common-env
     envVars:
@@ -82,5 +81,3 @@ envVarGroups:
         value: false
       - key: PYTHON_VERSION
         value: 3.12
-      # Не забудьте добавить остальные переменные (SENTRY_DSN, FCM, TWILIO)
-      # через веб-интерфейс Render в разделе "Environment"
