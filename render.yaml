@@ -1,0 +1,81 @@
+# render.yaml
+services:
+  # База данных PostGIS
+  - type: psql
+    name: mdd-db
+    postgresMajorVersion: 16
+    ipAllowList: [] # Доступ из любого места
+    plan: free
+    extensions:
+      - name: postgis
+
+  # Redis
+  - type: redis
+    name: mdd-redis
+    ipAllowList: []
+    plan: free
+
+  # Веб-сервис Django
+  - type: web
+    name: mdd-web
+    env: docker
+    repo: https://github.com/YOUR_USERNAME/mdd_backend.git # Замените на URL вашего репозитория
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          type: psql
+          name: mdd-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: mdd-redis
+          property: connectionString
+      - key: CACHE_URL
+        fromService:
+          type: redis
+          name: mdd-redis
+          property: connectionString
+      - fromGroup: common-env # Группа переменных ниже
+
+    # Команда, которая выполняется при каждом развертывании
+    initialDeployHook: |
+      python manage.py migrate
+      python manage.py collectstatic --no-input
+
+  # Celery Worker
+  - type: worker
+    name: mdd-worker
+    env: docker
+    repo: https://github.com/YOUR_USERNAME/mdd_backend.git
+    dockerfilePath: ./Dockerfile
+    dockerCommand: celery -A mdd_backend worker -l info
+    plan: free
+    envVars:
+      - fromGroup: common-env
+
+  # Celery Beat
+  - type: worker
+    name: mdd-beat
+    env: docker
+    repo: https://github.com/YOUR_USERNAME/mdd_backend.git
+    dockerfilePath: ./Dockerfile
+    dockerCommand: celery -A mdd_backend beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    plan: free
+    envVars:
+      - fromGroup: common-env
+
+# Общие переменные окружения
+envVarGroups:
+  - name: common-env
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true # Render сгенерирует ключ автоматически
+      - key: DEBUG
+        value: false
+      - key: PYTHON_VERSION
+        value: 3.12
+      # Сюда добавьте ваши SENTRY_DSN, FCM_SERVICE_ACCOUNT_JSON, TWILIO и т.д.
+      # Их можно будет вставить через веб-интерфейс Render
