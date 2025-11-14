@@ -1,7 +1,8 @@
-# render.yaml
+# render.yaml (ИСПРАВЛЕННАЯ ВЕРСИЯ)
+
 services:
   # База данных PostGIS
-  - type: psql
+  - type: postgres
     name: mdd-db
     postgresMajorVersion: 16
     ipAllowList: [] # Доступ из любого места
@@ -14,18 +15,22 @@ services:
     name: mdd-redis
     ipAllowList: []
     plan: free
+    plan: free
 
   # Веб-сервис Django
   - type: web
     name: mdd-web
     env: docker
-    repo: https://github.com/YOUR_USERNAME/mdd_backend.git # Замените на URL вашего репозитория
+    repo: https://github.com/D3dMak51m/mdd_backend.git
     dockerfilePath: ./Dockerfile
     plan: free
+    healthCheck:
+      path: /admin/login/
+      initialDelaySeconds: 60
     envVars:
       - key: DATABASE_URL
         fromService:
-          type: psql
+          type: postgres
           name: mdd-db
           property: connectionString
       - key: CELERY_BROKER_URL
@@ -49,7 +54,7 @@ services:
   - type: worker
     name: mdd-worker
     env: docker
-    repo: https://github.com/YOUR_USERNAME/mdd_backend.git
+    repo: https://github.com/D3dMak51m/mdd_backend.git
     dockerfilePath: ./Dockerfile
     dockerCommand: celery -A mdd_backend worker -l info
     plan: free
@@ -60,7 +65,7 @@ services:
   - type: worker
     name: mdd-beat
     env: docker
-    repo: https://github.com/YOUR_USERNAME/mdd_backend.git
+    repo: https://github.com/D3dMak51m/mdd_backend.git
     dockerfilePath: ./Dockerfile
     dockerCommand: celery -A mdd_backend beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     plan: free
@@ -72,10 +77,10 @@ envVarGroups:
   - name: common-env
     envVars:
       - key: DJANGO_SECRET_KEY
-        generateValue: true # Render сгенерирует ключ автоматически
+        generateValue: true
       - key: DEBUG
         value: false
       - key: PYTHON_VERSION
         value: 3.12
-      # Сюда добавьте ваши SENTRY_DSN, FCM_SERVICE_ACCOUNT_JSON, TWILIO и т.д.
-      # Их можно будет вставить через веб-интерфейс Render
+      # Не забудьте добавить остальные переменные (SENTRY_DSN, FCM, TWILIO)
+      # через веб-интерфейс Render в разделе "Environment"
