@@ -19,7 +19,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Настройки безопасности
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '10.0.2.2'])
 
 # Приложения
 INSTALLED_APPS = [
