@@ -7,6 +7,8 @@ from drf_yasg import openapi
 from rest_framework import permissions
 from django_prometheus.exports import ExportToDjangoView  # Импорт остается
 
+from apps.monitoring.views import LiveMonitorView
+
 schema_view = get_schema_view(
     openapi.Info(
         title="MDD Backend API",
@@ -18,6 +20,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    path('admin/monitoring/live/', LiveMonitorView.as_view(), name='live-monitor'),
     path('admin/', admin.site.urls),
 
     # Эндпоинт для метрик Prometheus (прямая передача функции)

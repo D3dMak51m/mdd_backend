@@ -36,6 +36,7 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/static
+      - ./firebase_credentials.json:/app/firebase_credentials.json
     ports:
       - "8000:8000"
     env_file:
@@ -52,6 +53,7 @@ services:
     command: celery -A mdd_backend worker -l info
     volumes:
       - .:/app
+      - ./firebase_credentials.json:/app/firebase_credentials.json
     env_file:
       - .env
     depends_on:
@@ -63,6 +65,7 @@ services:
     command: celery -A mdd_backend beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - .:/app
+      - ./firebase_credentials.json:/app/firebase_credentials.json
     env_file:
       - .env
     depends_on:

@@ -13,6 +13,11 @@ class SOSEvent(models.Model):
         MANUAL = 'MANUAL_TRIGGER', 'Manual Trigger'
         OTHER = 'OTHER', 'Other'
 
+    class Status(models.TextChoices):
+        NEW = 'NEW', 'New'
+        IN_PROGRESS = 'IN_PROGRESS', 'In Progress'  # Кто-то выехал
+        RESOLVED = 'RESOLVED', 'Resolved'  # Помощь оказана
+
     id = models.BigAutoField(primary_key=True)
     event_uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     device = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True, related_name='sos_events')
@@ -35,6 +40,18 @@ class SOSEvent(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.NEW)
+
+    # Кто принял вызов (едет на помощь)
+    accepted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='accepted_sos'
+    )
+    accepted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-timestamp']

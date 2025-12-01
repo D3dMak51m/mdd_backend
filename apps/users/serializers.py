@@ -2,6 +2,7 @@
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
@@ -43,3 +44,31 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('uuid', 'full_name', 'phone_number', 'email', 'role', 'status')
+
+class FCMTokenUpdateSerializer(serializers.ModelSerializer):
+    fcm_token = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('fcm_token',)
+
+    def update(self, instance, validated_data):
+        instance.fcm_token = validated_data.get('fcm_token', instance.fcm_token)
+        instance.save()
+        return instance
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    Кастомный сериализатор для логина.
+    Возвращает токены + данные пользователя.
+    """
+    def validate(self, attrs):
+        # Получаем стандартные токены (access, refresh)
+        data = super().validate(attrs)
+
+        # Добавляем данные пользователя в ответ
+        # self.user устанавливается в родительском методе validate после успешной аутентификации
+        user_data = UserSerializer(self.user).data
+        data['user'] = user_data
+
+        return data

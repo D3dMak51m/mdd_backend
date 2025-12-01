@@ -6,12 +6,14 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from rest_framework import serializers
 from django.contrib.gis.geos import Point
-
+from apps.users.serializers import UserSerializer
+from apps.devices.serializers import DeviceSerializer
 from .consumers import DispatcherConsumer
 from .models import SOSEvent
 from apps.devices.models import Device
 from .tasks import notify_nearby_helpers, escalation_watch
 from django_prometheus.models import model_deletes, model_inserts, model_updates
+
 
 class SOSEventTriggerSerializer(serializers.Serializer):
     device_uid = serializers.CharField(max_length=100)
@@ -108,3 +110,41 @@ class SOSEventSerializer(serializers.ModelSerializer):
     def get_lon(self, obj):
         return obj.latlon.x
 
+
+class SOSEventDetailSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    device = DeviceSerializer(read_only=True)
+    accepted_by = UserSerializer(read_only=True)
+    lat = serializers.SerializerMethodField()
+    lon = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SOSEvent
+        fields = (
+            'id',
+            'event_uid',
+            'status',
+            'timestamp',
+            'resolved',
+            'resolved_at',
+            'detected_type',
+            'severity',
+            'lat',
+            'lon',
+            'altitude',
+            'user',
+            'device',
+            'accepted_by',
+            'accepted_at',
+            'created_at'
+        )
+
+    def get_lat(self, obj):
+        return obj.latlon.y if obj.latlon else None
+
+    def get_lon(self, obj):
+        return obj.latlon.x if obj.latlon else None
+
+
+class SOSRespondSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=['ACCEPTED'])

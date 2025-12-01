@@ -4,6 +4,9 @@ import os
 from pathlib import Path
 import environ
 from datetime import timedelta
+from django.templatetags.static import static
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 # Инициализация django-environ
 env = environ.Env(
@@ -19,10 +22,25 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Настройки безопасности
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '10.0.2.2'])
+# ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '10.0.2.2', '192.168.1.2', '*', '192.168.1.6'])
+
+ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost",
+    "http://127.0.0.1",
+    "http://10.0.2.2",
+    "http://192.168.1.2",
+    "http://192.168.1.6",
+]
 
 # Приложения
 INSTALLED_APPS = [
+
+    # Django-unfold
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +66,86 @@ INSTALLED_APPS = [
     'apps.monitoring',
 ]
 
+UNFOLD = {
+    "SITE_TITLE": "MDD Dispatcher",
+    "SITE_HEADER": "MDD Platform",
+    "SITE_URL": "/",
+
+    # Принудительно подключаем стили и скрипты
+    "STYLES": [
+        lambda request: static("css/admin_custom.css"),
+    ],
+    "SCRIPTS": [
+        lambda request: static("js/admin_custom.js"),
+    ],
+
+    # Цветовая палитра (Slate - профессиональный серый/синий)
+    # Это решит проблему с контрастом
+    "COLORS": {
+        "primary": {
+            "50": "248 250 252",
+            "100": "241 245 249",
+            "200": "226 232 240",
+            "300": "203 213 225",
+            "400": "148 163 184",
+            "500": "100 116 139",
+            "600": "71 85 105",
+            "700": "51 65 85",
+            "800": "30 41 59",
+            "900": "15 23 42",
+            "950": "2 6 23",
+        },
+    },
+
+    # Настройка сайдбара (оставляем как было, но проверяем пути)
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": "Оперативный центр",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Главный Дашборд",
+                        "icon": "dashboard",
+                        "link": reverse_lazy("admin:index"),
+                    },
+                    {
+                        "title": "Мониторинг (Live)",
+                        "icon": "public",
+                        "link": reverse_lazy("live-monitor"),
+                    },
+                ],
+            },
+            {
+                "title": "Управление",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "SOS Сигналы",
+                        "icon": "notifications_active",
+                        "link": reverse_lazy("admin:sos_sosevent_changelist"),
+                        "badge": "apps.monitoring.dashboard.badge_active_sos",
+                    },
+                    {
+                        "title": "Устройства",
+                        "icon": "watch",
+                        "link": reverse_lazy("admin:devices_device_changelist"),
+                    },
+                    {
+                        "title": "Пользователи",
+                        "icon": "people",
+                        "link": reverse_lazy("admin:users_user_changelist"),
+                    },
+                ],
+            },
+        ],
+    },
+
+    "DASHBOARD_CALLBACK": "apps.monitoring.dashboard.dashboard_callback",
+}
+
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -66,7 +164,7 @@ ROOT_URLCONF = 'mdd_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

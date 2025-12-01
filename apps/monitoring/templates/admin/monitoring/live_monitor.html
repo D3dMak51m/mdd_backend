@@ -1,0 +1,260 @@
+{% extends 'unfold/layouts/base.html' %}
+{% load i18n %}
+
+{% block title %}
+    Live Monitor | MDD
+{% endblock %}
+
+<!-- Убираем хлебные крошки для экономии места на экране -->
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<!-- Обертка с явной высотой. Используем min-height и flex-col -->
+<div class="w-full bg-white dark:bg-gray-900 border dark:border-gray-700 shadow rounded-lg overflow-hidden flex flex-col" style="height: 85vh; min-height: 600px;">
+
+    <!-- Хедер -->
+    <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800 shrink-0">
+        <h1 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <span class="relative flex h-3 w-3">
+              <span id="ping-dot" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 hidden"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+            ОПЕРАТИВНЫЙ МОНИТОРИНГ
+        </h1>
+
+        <div class="flex items-center gap-4">
+            <div id="last-update" class="text-xs text-gray-500 dark:text-gray-400 font-mono hidden sm:block">
+                Ожидание...
+            </div>
+            <div id="connection-status" class="px-3 py-1 rounded text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">
+                Подключение...
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной контент: Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 h-full flex-1 relative overflow-hidden">
+
+        <!-- Сайдбар (1 колонка) -->
+        <div class="col-span-1 border-r dark:border-gray-700 flex flex-col h-full overflow-hidden bg-white dark:bg-gray-900 z-20 relative">
+            <div class="p-3 bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-700 font-bold text-xs uppercase text-gray-500 dark:text-gray-400 flex justify-between">
+                <span>Лента событий</span>
+                <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 rounded">
+                    {{ active_events|length }} Активных
+                </span>
+            </div>
+
+            <div id="events-list" class="flex-1 overflow-y-auto p-2 space-y-2" style="max-height: 100%;">
+                {% for event in active_events %}
+                <div id="event-{{ event.event_uid }}"
+                     class="p-3 rounded border-l-4 border-red-500 bg-gray-50 dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-gray-700 cursor-pointer border-t border-r border-b border-gray-200 dark:border-gray-700 shadow-sm transition-all"
+                     onclick="focusMap({{ event.latlon.y|stringformat:'f' }}, {{ event.latlon.x|stringformat:'f' }})">
+
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-xs font-bold text-red-600">{{ event.detected_type }}</span>
+                        <span class="text-xs text-gray-400">{{ event.timestamp|date:"H:i" }}</span>
+                    </div>
+                    <div class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                        {{ event.user.full_name|default:"Пользователь" }}
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        {{ event.user.phone_number }}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="p-4 text-center text-gray-400 text-sm flex flex-col items-center justify-center h-40">
+                    Нет активных вызовов
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Карта (3 колонки) -->
+        <div class="col-span-3 relative bg-gray-200 dark:bg-gray-800">
+            <!-- Плейсхолдер -->
+            <div id="map-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500 z-0">
+                Загрузка карты...
+            </div>
+            <!-- Контейнер карты с явными стилями -->
+            <div id="map" class="absolute inset-0 z-10" style="height: 100%; width: 100%;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    /* --- КРИТИЧЕСКИЙ ФИКС ДЛЯ TAILWIND + LEAFLET --- */
+    .leaflet-container img.leaflet-tile,
+    .leaflet-container img.leaflet-marker-icon,
+    .leaflet-container img.leaflet-marker-shadow {
+        max-width: none !important;
+        max-height: none !important;
+        width: auto !important;
+        height: auto !important;
+    }
+
+    .leaflet-pane,
+    .leaflet-tile,
+    .leaflet-marker-icon,
+    .leaflet-marker-shadow,
+    .leaflet-tile-container,
+    .leaflet-pane > svg,
+    .leaflet-pane > canvas,
+    .leaflet-zoom-box,
+    .leaflet-image-layer,
+    .leaflet-layer {
+        position: absolute !important;
+        left: 0;
+        top: 0;
+    }
+
+    /* Стили маркера */
+    .sos-marker { background: transparent; border: none; }
+    .sos-marker::before {
+        content: ''; position: absolute; left: -10px; top: -10px; width: 40px; height: 40px;
+        background-color: rgba(239, 68, 68, 0.5); border-radius: 50%;
+        animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    .sos-marker::after {
+        content: ''; position: absolute; left: 0; top: 0; width: 20px; height: 20px;
+        background-color: #ef4444; border: 2px solid white; border-radius: 50%;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    @keyframes pulse-ring {
+        0% { transform: scale(0.33); opacity: 1; }
+        80%, 100% { transform: scale(2); opacity: 0; }
+    }
+</style>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("Live Monitor Init...");
+
+        // 1. Инициализация карты
+        const mapEl = document.getElementById('map');
+        if (!mapEl) return;
+
+        const map = L.map('map').setView([41.311, 69.240], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            maxZoom: 19
+        }).addTo(map);
+
+        setTimeout(() => { map.invalidateSize(); }, 300);
+
+        const sosIcon = L.divIcon({
+            className: 'sos-marker',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10],
+            popupAnchor: [0, -10]
+        });
+
+        const markers = {};
+
+        // Функция добавления маркера
+        window.addMarker = function(event) {
+            if (markers[event.event_uid]) return;
+
+            const marker = L.marker([event.lat, event.lon], {icon: sosIcon})
+                .addTo(map)
+                .bindPopup(`
+                    <div class="text-center">
+                        <strong style="color: red;">${event.detected_type}</strong><br>
+                        ${event.user_phone}<br>
+                        <a href="/admin/sos/sosevent/${event.id}/change/" target="_blank" style="color:blue; text-decoration:underline;">Открыть</a>
+                    </div>
+                `);
+
+            markers[event.event_uid] = true;
+
+            // Обновление списка
+            const list = document.getElementById('events-list');
+            const emptyMsg = list.querySelector('.text-center');
+            if(emptyMsg) emptyMsg.remove();
+
+            const item = document.createElement('div');
+            item.className = "p-3 rounded border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 cursor-pointer border-t border-r border-b border-red-200 dark:border-red-800 mb-2 animate-pulse";
+            item.innerHTML = `
+                <div class="flex justify-between items-start mb-1">
+                    <span class="text-xs font-bold text-red-600">NEW: ${event.detected_type}</span>
+                    <span class="text-xs text-gray-500">Just now</span>
+                </div>
+                <div class="text-sm font-medium text-gray-900 dark:text-white">${event.user_phone}</div>
+            `;
+            item.onclick = () => map.setView([event.lat, event.lon], 16);
+            list.prepend(item);
+
+            // Звук
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                oscillator.connect(audioContext.destination);
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch(e) {}
+
+            map.setView([event.lat, event.lon], 16);
+        };
+
+        window.focusMap = function(lat, lon) {
+            map.flyTo([lat, lon], 16, { duration: 1.5 });
+        };
+
+        // Рендеринг существующих
+        {% for event in active_events %}
+            L.marker([{{ event.latlon.y|stringformat:'f' }}, {{ event.latlon.x|stringformat:'f' }}], {icon: sosIcon})
+             .addTo(map)
+             .bindPopup(`
+                <div style="text-align: center;">
+                    <strong style="color: red;">{{ event.detected_type }}</strong><br>
+                    {{ event.user.phone_number }}<br>
+                    <a href="/admin/sos/sosevent/{{ event.id }}/change/" target="_blank" style="color:blue; text-decoration:underline;">Открыть</a>
+                </div>
+             `);
+            markers['{{ event.event_uid }}'] = true;
+        {% endfor %}
+
+        // WebSocket
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const wsUrl = protocol + window.location.host + '/ws/sos_events/';
+        const statusDiv = document.getElementById('connection-status');
+        const pingDot = document.getElementById('ping-dot');
+        const lastUpdateDiv = document.getElementById('last-update');
+
+        let socket;
+
+        function connectWs() {
+            socket = new WebSocket(wsUrl);
+
+            socket.onopen = () => {
+                statusDiv.textContent = "ONLINE";
+                statusDiv.className = "px-3 py-1 rounded text-xs font-bold bg-green-100 text-green-800 border border-green-200";
+                pingDot.classList.remove('hidden');
+            };
+
+            socket.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if (data.type === 'sos_event') {
+                    addMarker(data.payload);
+                    lastUpdateDiv.textContent = "Last: " + new Date().toLocaleTimeString();
+                }
+            };
+
+            socket.onclose = () => {
+                statusDiv.textContent = "OFFLINE";
+                statusDiv.className = "px-3 py-1 rounded text-xs font-bold bg-red-100 text-red-800 border border-red-200";
+                pingDot.classList.add('hidden');
+                setTimeout(connectWs, 3000);
+            };
+        }
+
+        connectWs();
+    });
+</script>
+{% endblock %}

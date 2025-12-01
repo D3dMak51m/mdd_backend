@@ -9,9 +9,61 @@ from apps.devices.models import Device
 from apps.notifications.models import NotificationLog
 from apps.notifications.tasks import send_push_notification
 from apps.monitoring.models import SettingsConfig
+from django.utils import timezone
+from apps.notifications.services import send_fcm_push
+from ..users.models import User
 
 logger = get_task_logger(__name__)
 
+@shared_task
+def notify_status_change(sos_id, responder_id):
+    """
+    1. Уведомляет пострадавшего, что помощь едет.
+    2. Уведомляет остальных помощников, что вызов принят другим.
+    """
+    try:
+        sos_event = SOSEvent.objects.select_related('user', 'device').get(id=sos_id)
+        responder = User.objects.get(id=responder_id)
+    except (SOSEvent.DoesNotExist, User.DoesNotExist):
+        return
+
+    # 1. Уведомление ПОСТРАДАВШЕМУ
+    if sos_event.user and sos_event.user.fcm_token:
+        try:
+            send_fcm_push(
+                token=sos_event.user.fcm_token,
+                title="Помощь в пути!",
+                body=f"{responder.full_name} принял ваш вызов и направляется к вам.",
+                data={
+                    "type": "SOS_ACCEPTED",
+                    "sos_id": str(sos_event.event_uid),
+                    "responder_phone": responder.phone_number
+                }
+            )
+        except Exception as e:
+            logger.error(f"Не удалось уведомить пострадавшего: {e}")
+
+    # 2. Уведомление ОСТАЛЬНЫМ ПОМОЩНИКАМ (Отмена)
+    # Находим всех, кому мы отправляли пуш об этом событии, КРОМЕ того, кто принял
+    other_notifications = NotificationLog.objects.filter(
+        sos_event=sos_event,
+        notification_type=NotificationLog.NotificationType.PUSH
+    ).exclude(recipient_id=responder_id)
+
+    for log in other_notifications:
+        if log.recipient.fcm_token:
+            try:
+                send_fcm_push(
+                    token=log.recipient.fcm_token,
+                    title="Вызов принят",
+                    body="Другой пользователь уже выехал на помощь. Спасибо за готовность!",
+                    data={
+                        "type": "SOS_CANCELLED_FOR_OTHERS",
+                        "sos_id": str(sos_event.event_uid)
+                    }
+                )
+            except Exception:
+                continue
 
 @shared_task
 def notify_nearby_helpers(sos_id):

@@ -8,10 +8,11 @@ redis==7.0.0
 channels-redis==4.3.0
 drf-yasg==1.21.11
 sentry-sdk==2.42.1
-uvicorn==0.38.0
+uvicorn[standard]==0.38.0
 django-cors-headers==4.9.0
 django-prometheus==2.4.1
 django-celery-beat==2.8.1
 firebase-admin==7.1.0
 twilio==9.8.4
 honcho==2.0.0
+django-unfold==0.72.0

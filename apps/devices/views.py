@@ -1,12 +1,14 @@
 # apps/devices/views.py
+import json
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.views.generic import DetailView
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import Device
+from .models import Device, LocationTrack
 from .serializers import DeviceSerializer, DeviceStatusUpdateSerializer, LocationTrackSerializer
-
 
 class DeviceViewSet(viewsets.ModelViewSet):
     queryset = Device.objects.all()
@@ -61,3 +63,25 @@ class DeviceViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], serializer_class=LocationTrackSerializer)
     def location(self, request, device_uid=None):
         return super().location(request, device_uid)
+
+
+class DeviceHistoryView(UserPassesTestMixin, DetailView):
+    model = Device
+    template_name = 'admin/devices/history.html'
+    context_object_name = 'device'
+    slug_field = 'device_uid'
+    slug_url_kwarg = 'device_uid'
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Получаем последние 100 точек трека
+        tracks = LocationTrack.objects.filter(device=self.object).order_by('-created_at')[:100]
+
+        # Формируем GeoJSON LineString
+        coordinates = [[t.latlon.y, t.latlon.x] for t in tracks if t.latlon]
+
+        context['track_json'] = json.dumps(coordinates)
+        return context

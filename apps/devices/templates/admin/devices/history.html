@@ -1,0 +1,41 @@
+{% extends 'unfold/layouts/base.html' %}
+
+{% block title %} История: {{ device.model }} {% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-[calc(100vh-100px)]">
+    <div class="mb-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">История передвижений: {{ device.device_uid }}</h1>
+        <a href="/admin/devices/device/" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Назад</a>
+    </div>
+
+    <div class="flex-1 bg-white rounded-lg shadow border p-1">
+        <div id="history-map" class="w-full h-full rounded"></div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    const map = L.map('history-map');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(map);
+
+    const trackPoints = {{ track_json|safe }};
+
+    if (trackPoints.length > 0) {
+        // Рисуем линию
+        const polyline = L.polyline(trackPoints, {color: 'blue', weight: 4}).addTo(map);
+
+        // Зуммируем карту к линии
+        map.fitBounds(polyline.getBounds());
+
+        // Маркеры начала и конца
+        L.marker(trackPoints[0]).addTo(map).bindPopup("Последняя точка").openPopup();
+        L.marker(trackPoints[trackPoints.length - 1]).addTo(map).bindPopup("Начало трека");
+    } else {
+        map.setView([41.311, 69.240], 12);
+        alert("Нет данных о перемещении");
+    }
+</script>
+{% endblock %}

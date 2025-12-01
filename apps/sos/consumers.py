@@ -7,18 +7,15 @@ class DispatcherConsumer(AsyncWebsocketConsumer):
     GROUP_NAME = 'sos_events_dispatchers'
 
     async def connect(self):
-        """
-        Вызывается при установлении WebSocket-соединения.
-        """
-        # Мы будем добавлять в группу только аутентифицированных администраторов
-        if self.scope["user"].is_authenticated and self.scope["user"].role == 'ADMIN':
+        user = self.scope["user"]
+        # Разрешаем подключение, если пользователь авторизован И (является админом ПО РОЛИ или является ПЕРСОНАЛОМ/СУПЕРЮЗЕРОМ)
+        if user.is_authenticated and (user.role == 'ADMIN' or user.is_staff):
             await self.channel_layer.group_add(
                 self.GROUP_NAME,
                 self.channel_name
             )
             await self.accept()
         else:
-            # Отклоняем соединение для неавторизованных пользователей
             await self.close()
 
     async def disconnect(self, close_code):
