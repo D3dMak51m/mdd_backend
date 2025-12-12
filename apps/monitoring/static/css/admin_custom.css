@@ -3,6 +3,25 @@
 /* --- Импорт современного шрифта --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+/* --- Material Symbols Icons --- */
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'liga';
+}
+
 /* --- Глобальные стили --- */
 * {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -260,9 +279,36 @@ tbody tr:hover {
     padding: 20px !important;
 }
 
-/* --- Кнопка удаления темы (скрываем) --- */
-button[data-action="theme-toggle"] {
+/* --- Принудительная светлая тема --- */
+html {
+    color-scheme: light !important;
+}
+
+html.dark,
+html[data-theme="dark"] {
+    color-scheme: light !important;
+}
+
+/* Скрываем переключатель темы */
+button[data-action="theme-toggle"],
+[data-theme-toggle],
+.theme-toggle,
+button[aria-label*="theme"],
+button[aria-label*="Theme"] {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Принудительно светлые цвета для всех элементов */
+body,
+.bg-gray-900,
+.bg-slate-900,
+.dark\:bg-gray-900,
+.dark\:bg-slate-900 {
+    background-color: #ffffff !important;
+    color: #111827 !important;
 }
 
 /* --- Прогресс-бары --- */
@@ -303,6 +349,126 @@ button[data-action="theme-toggle"] {
     color: #374151 !important;
     margin-bottom: 8px !important;
     display: block !important;
+    font-size: 14px !important;
+}
+
+/* Улучшенные поля формы */
+.form-row input[type="text"],
+.form-row input[type="password"],
+.form-row input[type="email"],
+.form-row input[type="number"],
+.form-row input[type="tel"],
+.form-row input[type="datetime-local"],
+.form-row select,
+.form-row textarea {
+    width: 100% !important;
+    max-width: 600px !important;
+}
+
+/* Чекбоксы и радио */
+.form-row input[type="checkbox"],
+.form-row input[type="radio"] {
+    width: auto !important;
+    margin-right: 8px !important;
+}
+
+/* Группы полей */
+.fieldset {
+    background: #f9fafb !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin-bottom: 24px !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.fieldset legend {
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    color: #111827 !important;
+    padding: 0 12px !important;
+    margin-bottom: 16px !important;
+}
+
+/* Inline формы */
+.inline-related {
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Помощь */
+.help {
+    font-size: 13px !important;
+    color: #6b7280 !important;
+    margin-top: 6px !important;
+    display: block !important;
+}
+
+/* Ошибки */
+.errorlist {
+    background: #fee2e2 !important;
+    border: 1px solid #fca5a5 !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    margin: 8px 0 !important;
+    color: #dc2626 !important;
+    font-size: 13px !important;
+}
+
+.errorlist li {
+    list-style: none !important;
+    padding: 4px 0 !important;
+}
+
+/* Права пользователя - улучшенный вид */
+.selector {
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.selector select {
+    min-height: 200px !important;
+    background: white !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 8px !important;
+}
+
+.selector-available h2,
+.selector-chosen h2 {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 12px !important;
+}
+
+/* Кнопки между селекторами */
+.selector-chooser {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 0 16px !important;
+}
+
+.selector-chooser a {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    text-align: center !important;
+    font-size: 20px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+.selector-chooser a:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4) !important;
 }
 
 /* --- Статус индикаторы --- */

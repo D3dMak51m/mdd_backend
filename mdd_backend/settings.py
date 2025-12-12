@@ -74,6 +74,8 @@ UNFOLD = {
     # Подключаем кастомные стили и скрипты
     "STYLES": [
         lambda request: static("css/admin_custom.css"),
+        # Google Material Symbols Icons
+        "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200",
     ],
     "SCRIPTS": [
         lambda request: static("js/admin_custom.js"),
@@ -82,17 +84,17 @@ UNFOLD = {
     # Современная цветовая палитра (Violet/Purple)
     "COLORS": {
         "primary": {
-            "50": "250 245 255",   # violet-50
-            "100": "243 232 255",  # violet-100
-            "200": "233 213 255",  # violet-200
-            "300": "216 180 254",  # violet-300
-            "400": "192 132 252",  # violet-400
-            "500": "168 85 247",   # violet-500
-            "600": "147 51 234",   # violet-600
-            "700": "126 34 206",   # violet-700
-            "800": "107 33 168",   # violet-800
-            "900": "88 28 135",    # violet-900
-            "950": "59 7 100",     # violet-950
+            "50": "250 245 255",
+            "100": "243 232 255",
+            "200": "233 213 255",
+            "300": "216 180 254",
+            "400": "192 132 252",
+            "500": "168 85 247",
+            "600": "147 51 234",
+            "700": "126 34 206",
+            "800": "107 33 168",
+            "900": "88 28 135",
+            "950": "59 7 100",
         },
     },
 
