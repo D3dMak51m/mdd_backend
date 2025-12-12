@@ -23,50 +23,68 @@ def badge_active_sos(request):
 
 def dashboard_callback(request, context):
     """
-    Основная функция для генерации данных Дашборда (Главная страница админки).
+    Основная функция для генерации данных Дашборда с улучшенным дизайном.
     """
 
-    # --- 1. Сбор метрик (KPI) ---
+    # --- 1. Сбор метрик (KPI) с градиентами ---
     active_sos_count = SOSEvent.objects.filter(resolved=False).count()
     online_devices_count = Device.objects.filter(is_online=True).count()
     total_devices = Device.objects.count()
     sos_today = SOSEvent.objects.filter(timestamp__date=timezone.now().date()).count()
     total_users = User.objects.count()
 
-    # Формируем карточки KPI
+    # Расчет трендов (пример)
+    yesterday = timezone.now().date() - timedelta(days=1)
+    sos_yesterday = SOSEvent.objects.filter(timestamp__date=yesterday).count()
+    sos_trend = round(((sos_today - sos_yesterday) / max(sos_yesterday, 1)) * 100, 1) if sos_yesterday else 0
+
+    # Формируем карточки KPI с градиентами
     kpi = [
         {
             "title": "АКТИВНЫЕ ТРЕВОГИ",
             "metric": active_sos_count,
             "footer": "Требуют реакции",
-            "color": "text-red-600",  # Ярко-красный текст
-            "icon": "warning",
+            "footer_icon": "warning",
+            "icon": "emergency",
+            "gradient_from": "red",
+            "gradient_to": "orange",
+            "trend": None,
         },
         {
             "title": "Устройств Онлайн",
             "metric": f"{online_devices_count} / {total_devices}",
             "footer": "Мониторинг сети",
-            "color": "text-emerald-600",  # Ярко-зеленый текст
+            "footer_icon": "wifi",
             "icon": "router",
+            "gradient_from": "emerald",
+            "gradient_to": "teal",
+            "trend": None,
         },
         {
-            "title": "Инцидентов за сегодня",
+            "title": "Инцидентов сегодня",
             "metric": sos_today,
             "footer": timezone.now().strftime("%d.%m.%Y"),
-            "color": "text-amber-600",  # Янтарный текст
-            "icon": "history",
+            "footer_icon": "calendar_today",
+            "icon": "timeline",
+            "gradient_from": "amber",
+            "gradient_to": "orange",
+            "trend": sos_trend,
         },
         {
             "title": "Всего пользователей",
             "metric": total_users,
             "footer": "База данных",
-            "color": "text-blue-600",  # Синий текст
+            "footer_icon": "database",
             "icon": "group",
+            "gradient_from": "blue",
+            "gradient_to": "indigo",
+            "trend": None,
         },
-    ]    # --- 2. Подготовка данных для Графика (Линейный - SOS за 7 дней) ---
+    ]
+
+    # --- 2. Подготовка данных для Графика (Линейный - SOS за 7 дней) ---
     last_7_days = timezone.now() - timedelta(days=7)
 
-    # Агрегация по дням
     sos_by_day = (
         SOSEvent.objects.filter(timestamp__gte=last_7_days)
         .annotate(day=TruncDay('timestamp'))
@@ -75,16 +93,12 @@ def dashboard_callback(request, context):
         .order_by('day')
     )
 
-    # Заполнение пропущенных дней нулями
     days_labels = []
     days_data = []
 
     for i in range(7):
-        # Идем от 6 дней назад до сегодня
         date_cursor = (timezone.now() - timedelta(days=6 - i)).date()
         days_labels.append(date_cursor.strftime("%d.%m"))
-
-        # Ищем, есть ли данные за этот день
         val = next((item['count'] for item in sos_by_day if item['day'].date() == date_cursor), 0)
         days_data.append(val)
 
@@ -98,8 +112,7 @@ def dashboard_callback(request, context):
     type_labels = [item['detected_type'] for item in sos_types]
     type_data = [item['count'] for item in sos_types]
 
-    # --- 4. Подготовка данных для Карты Флота (Все устройства) ---
-    # Берем только устройства, у которых есть координаты
+    # --- 4. Подготовка данных для Карты Флота ---
     devices_qs = Device.objects.filter(last_latlon__isnull=False).select_related('owner')
 
     devices_map_data = []
@@ -119,32 +132,28 @@ def dashboard_callback(request, context):
         {
             "title": "Динамика инцидентов (7 дней)",
             "type": "line",
+            "icon": "timeline",
             "labels": days_labels,
             "datasets": [
                 {
                     "label": "Количество SOS",
                     "data": days_data,
-                    "borderColor": "#dc2626",  # red-600
-                    "backgroundColor": "rgba(220, 38, 38, 0.1)",
-                    "fill": True,
-                    "tension": 0.4,  # Сглаживание линий
                 }
             ],
+            "stats": [
+                {"label": "Сегодня", "value": sos_today},
+                {"label": "Всего за неделю", "value": sum(days_data)},
+                {"label": "Среднее/день", "value": round(sum(days_data) / 7, 1)},
+            ]
         },
         {
             "title": "Типы угроз",
             "type": "doughnut",
+            "icon": "pie_chart",
             "labels": type_labels,
             "datasets": [
                 {
                     "data": type_data,
-                    "backgroundColor": [
-                        "#ef4444",  # red
-                        "#f97316",  # orange
-                        "#3b82f6",  # blue
-                        "#a855f7",  # purple
-                        "#10b981",  # emerald
-                    ],
                 }
             ],
         },
@@ -153,17 +162,28 @@ def dashboard_callback(request, context):
     # --- 6. Обновление контекста ---
     context.update({
         "kpi": kpi,
-        # JSON строки для использования в JavaScript
         "devices_json": json.dumps(devices_map_data, cls=DjangoJSONEncoder),
         "charts_json": json.dumps(charts_config, cls=DjangoJSONEncoder),
-
-        # Объект charts нужен для цикла в шаблоне (чтобы создать canvas элементы)
         "charts": charts_config,
-
-        # Дополнительная навигация на дашборде (опционально)
         "navigation": [
-            {"title": "Открыть Live Monitor", "link": "/admin/monitoring/live/", "icon": "public"},
-            {"title": "Список устройств", "link": "/admin/devices/device/", "icon": "watch"},
+            {
+                "title": "Открыть Live Monitor",
+                "link": "/admin/monitoring/live/",
+                "icon": "emergency",
+                "description": "Мониторинг в реальном времени"
+            },
+            {
+                "title": "Список устройств",
+                "link": "/admin/devices/device/",
+                "icon": "watch",
+                "description": "Управление устройствами"
+            },
+            {
+                "title": "SOS События",
+                "link": "/admin/sos/sosevent/",
+                "icon": "notifications_active",
+                "description": "История инцидентов"
+            },
         ]
     })
 

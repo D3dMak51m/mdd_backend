@@ -68,10 +68,10 @@ INSTALLED_APPS = [
 
 UNFOLD = {
     "SITE_TITLE": "MDD Dispatcher",
-    "SITE_HEADER": "MDD Platform",
+    "SITE_HEADER": "Man Down Detection Platform",
     "SITE_URL": "/",
 
-    # Принудительно подключаем стили и скрипты
+    # Подключаем кастомные стили и скрипты
     "STYLES": [
         lambda request: static("css/admin_custom.css"),
     ],
@@ -79,25 +79,24 @@ UNFOLD = {
         lambda request: static("js/admin_custom.js"),
     ],
 
-    # Цветовая палитра (Slate - профессиональный серый/синий)
-    # Это решит проблему с контрастом
+    # Современная цветовая палитра (Violet/Purple)
     "COLORS": {
         "primary": {
-            "50": "248 250 252",
-            "100": "241 245 249",
-            "200": "226 232 240",
-            "300": "203 213 225",
-            "400": "148 163 184",
-            "500": "100 116 139",
-            "600": "71 85 105",
-            "700": "51 65 85",
-            "800": "30 41 59",
-            "900": "15 23 42",
-            "950": "2 6 23",
+            "50": "250 245 255",   # violet-50
+            "100": "243 232 255",  # violet-100
+            "200": "233 213 255",  # violet-200
+            "300": "216 180 254",  # violet-300
+            "400": "192 132 252",  # violet-400
+            "500": "168 85 247",   # violet-500
+            "600": "147 51 234",   # violet-600
+            "700": "126 34 206",   # violet-700
+            "800": "107 33 168",   # violet-800
+            "900": "88 28 135",    # violet-900
+            "950": "59 7 100",     # violet-950
         },
     },
 
-    # Настройка сайдбара (оставляем как было, но проверяем пути)
+    # Настройка сайдбара
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": False,
@@ -105,6 +104,7 @@ UNFOLD = {
             {
                 "title": "Оперативный центр",
                 "separator": True,
+                "collapsible": False,
                 "items": [
                     {
                         "title": "Главный Дашборд",
@@ -112,15 +112,17 @@ UNFOLD = {
                         "link": reverse_lazy("admin:index"),
                     },
                     {
-                        "title": "Мониторинг (Live)",
-                        "icon": "public",
+                        "title": "Live Мониторинг",
+                        "icon": "emergency",
                         "link": reverse_lazy("live-monitor"),
+                        "badge": "apps.monitoring.dashboard.badge_active_sos",
                     },
                 ],
             },
             {
                 "title": "Управление",
                 "separator": True,
+                "collapsible": False,
                 "items": [
                     {
                         "title": "SOS Сигналы",
@@ -140,9 +142,32 @@ UNFOLD = {
                     },
                 ],
             },
+            {
+                "title": "Система",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Настройки",
+                        "icon": "settings",
+                        "link": reverse_lazy("admin:monitoring_settingsconfig_changelist"),
+                    },
+                    {
+                        "title": "Метрики",
+                        "icon": "analytics",
+                        "link": "/metrics/",
+                    },
+                    {
+                        "title": "API Документация",
+                        "icon": "code",
+                        "link": "/swagger/",
+                    },
+                ],
+            },
         ],
     },
 
+    # Callback для дашборда
     "DASHBOARD_CALLBACK": "apps.monitoring.dashboard.dashboard_callback",
 }
 

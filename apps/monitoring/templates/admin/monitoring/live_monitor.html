@@ -1,82 +1,150 @@
 {% extends 'unfold/layouts/base.html' %}
 {% load i18n %}
 
-{% block title %}
-    Live Monitor | MDD
-{% endblock %}
-
-<!-- Убираем хлебные крошки для экономии места на экране -->
+{% block title %}Live Monitor | MDD{% endblock %}
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
-<!-- Обертка с явной высотой. Используем min-height и flex-col -->
-<div class="w-full bg-white dark:bg-gray-900 border dark:border-gray-700 shadow rounded-lg overflow-hidden flex flex-col" style="height: 85vh; min-height: 600px;">
+<div class="w-full bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-200" style="height: 85vh; min-height: 600px;">
 
-    <!-- Хедер -->
-    <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800 shrink-0">
-        <h1 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-            <span class="relative flex h-3 w-3">
-              <span id="ping-dot" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 hidden"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-            </span>
-            ОПЕРАТИВНЫЙ МОНИТОРИНГ
-        </h1>
+    <!-- Модернизированный хедер с градиентом -->
+    <div class="relative overflow-hidden bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 px-6 py-5 shrink-0">
+        <!-- Анимированный фон -->
+        <div class="absolute inset-0 bg-grid-white/[0.05] bg-[size:30px_30px]"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-transparent to-blue-500/20 animate-pulse-slow"></div>
 
-        <div class="flex items-center gap-4">
-            <div id="last-update" class="text-xs text-gray-500 dark:text-gray-400 font-mono hidden sm:block">
-                Ожидание...
+        <div class="relative flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <!-- Пульсирующий индикатор -->
+                <div class="relative">
+                    <div class="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                    <div class="relative flex h-4 w-4 rounded-full bg-red-500 shadow-lg shadow-red-500/50"></div>
+                </div>
+
+                <div>
+                    <h1 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <span class="material-symbols-outlined text-3xl">emergency</span>
+                        ОПЕРАТИВНЫЙ МОНИТОРИНГ
+                    </h1>
+                    <p class="text-purple-200 text-sm mt-1">Real-time Emergency Response System</p>
+                </div>
             </div>
-            <div id="connection-status" class="px-3 py-1 rounded text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">
-                Подключение...
+
+            <!-- Статус панель -->
+            <div class="flex items-center gap-4">
+                <div id="last-update" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
+                    <span class="material-symbols-outlined text-white text-sm">schedule</span>
+                    <span class="text-xs text-white font-mono">Ожидание...</span>
+                </div>
+
+                <div id="connection-status" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-500/20 backdrop-blur-md border border-yellow-400/30">
+                    <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+                    <span class="text-xs font-bold text-yellow-100">Подключение...</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Основной контент: Grid -->
+    <!-- Основной контент -->
     <div class="grid grid-cols-1 md:grid-cols-4 h-full flex-1 relative overflow-hidden">
 
-        <!-- Сайдбар (1 колонка) -->
-        <div class="col-span-1 border-r dark:border-gray-700 flex flex-col h-full overflow-hidden bg-white dark:bg-gray-900 z-20 relative">
-            <div class="p-3 bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-700 font-bold text-xs uppercase text-gray-500 dark:text-gray-400 flex justify-between">
-                <span>Лента событий</span>
-                <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 rounded">
-                    {{ active_events|length }} Активных
-                </span>
+        <!-- Улучшенный сайдбар -->
+        <div class="col-span-1 bg-white/80 backdrop-blur-xl border-r border-gray-200 flex flex-col h-full overflow-hidden z-20 relative">
+            <!-- Заголовок ленты -->
+            <div class="px-4 py-4 bg-gradient-to-r from-red-500 to-orange-600 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-white text-xl">notifications_active</span>
+                    <span class="font-bold text-sm uppercase text-white tracking-wide">Активные вызовы</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm">
+                    <span class="text-white text-sm font-bold">{{ active_events|length }}</span>
+                </div>
             </div>
 
-            <div id="events-list" class="flex-1 overflow-y-auto p-2 space-y-2" style="max-height: 100%;">
+            <!-- Лента событий -->
+            <div id="events-list" class="flex-1 overflow-y-auto p-3 space-y-3" style="max-height: 100%;">
                 {% for event in active_events %}
                 <div id="event-{{ event.event_uid }}"
-                     class="p-3 rounded border-l-4 border-red-500 bg-gray-50 dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-gray-700 cursor-pointer border-t border-r border-b border-gray-200 dark:border-gray-700 shadow-sm transition-all"
+                     class="group relative overflow-hidden rounded-xl border-l-4 border-red-500 bg-gradient-to-r from-red-50 to-white hover:from-red-100 hover:to-red-50 cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                      onclick="focusMap({{ event.latlon.y|stringformat:'f' }}, {{ event.latlon.x|stringformat:'f' }})">
 
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-xs font-bold text-red-600">{{ event.detected_type }}</span>
-                        <span class="text-xs text-gray-400">{{ event.timestamp|date:"H:i" }}</span>
+                    <!-- Контент карточки -->
+                    <div class="p-4">
+                        <!-- Заголовок -->
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="p-1.5 rounded-lg bg-red-100">
+                                    <span class="material-symbols-outlined text-red-600 text-sm">warning</span>
+                                </div>
+                                <span class="text-xs font-bold text-red-700 uppercase tracking-wide">
+                                    {{ event.detected_type }}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-400 font-mono">{{ event.timestamp|date:"H:i" }}</span>
+                        </div>
+
+                        <!-- Информация о пользователе -->
+                        <div class="mb-3">
+                            <div class="text-base font-bold text-gray-900 mb-1">
+                                {{ event.user.full_name|default:"Неизвестный пользователь" }}
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <span class="material-symbols-outlined text-xs">phone</span>
+                                {{ event.user.phone_number }}
+                            </div>
+                        </div>
+
+                        <!-- Футер -->
+                        <div class="flex items-center justify-between pt-3 border-t border-red-100">
+                            <div class="flex items-center gap-1 text-xs text-gray-500">
+                                <span class="material-symbols-outlined text-sm">location_on</span>
+                                <span>Координаты получены</span>
+                            </div>
+                            <div class="flex items-center gap-1 text-xs font-semibold text-red-600">
+                                <div class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
+                                <span>Активно</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                        {{ event.user.full_name|default:"Пользователь" }}
-                    </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                        {{ event.user.phone_number }}
-                    </div>
+
+                    <!-- Декоративный элемент -->
+                    <div class="absolute -right-6 -top-6 w-20 h-20 bg-red-500/10 rounded-full blur-2xl group-hover:bg-red-500/20 transition-all"></div>
                 </div>
                 {% empty %}
-                <div class="p-4 text-center text-gray-400 text-sm flex flex-col items-center justify-center h-40">
-                    Нет активных вызовов
+                <div class="flex flex-col items-center justify-center h-full p-8 text-center">
+                    <div class="p-6 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 mb-4">
+                        <span class="material-symbols-outlined text-green-600 text-5xl">check_circle</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">Все спокойно</h3>
+                    <p class="text-sm text-gray-500">Нет активных вызовов</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- Карта (3 колонки) -->
-        <div class="col-span-3 relative bg-gray-200 dark:bg-gray-800">
-            <!-- Плейсхолдер -->
-            <div id="map-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500 z-0">
-                Загрузка карты...
+        <!-- Улучшенная карта -->
+        <div class="col-span-3 relative bg-gray-900">
+            <!-- Плейсхолдер с анимацией -->
+            <div id="map-placeholder" class="absolute inset-0 flex flex-col items-center justify-center z-0 bg-gradient-to-br from-slate-800 to-slate-900">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-purple-500 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+                    <span class="relative material-symbols-outlined text-white text-6xl animate-bounce">map</span>
+                </div>
+                <p class="text-white mt-4 text-lg font-medium">Загрузка карты...</p>
             </div>
-            <!-- Контейнер карты с явными стилями -->
+
+            <!-- Контейнер карты -->
             <div id="map" class="absolute inset-0 z-10" style="height: 100%; width: 100%;"></div>
+
+            <!-- Панель управления картой -->
+            <div class="absolute top-4 right-4 z-20 flex flex-col gap-2">
+                <button class="p-3 rounded-xl bg-white/95 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all group">
+                    <span class="material-symbols-outlined text-gray-700 group-hover:text-purple-600 transition-colors">my_location</span>
+                </button>
+                <button class="p-3 rounded-xl bg-white/95 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all group">
+                    <span class="material-symbols-outlined text-gray-700 group-hover:text-purple-600 transition-colors">layers</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -85,7 +153,39 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <style>
-    /* --- КРИТИЧЕСКИЙ ФИКС ДЛЯ TAILWIND + LEAFLET --- */
+    /* Анимации */
+    @keyframes pulse-slow {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.6; }
+    }
+
+    .animate-pulse-slow {
+        animation: pulse-slow 4s ease-in-out infinite;
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .animate-slideInRight {
+        animation: slideInRight 0.4s ease-out;
+    }
+
+    /* Градиентная сетка */
+    .bg-grid-white\/\[0\.05\] {
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    }
+
+    /* Фикс для Leaflet */
     .leaflet-container img.leaflet-tile,
     .leaflet-container img.leaflet-marker-icon,
     .leaflet-container img.leaflet-marker-shadow {
@@ -110,21 +210,78 @@
         top: 0;
     }
 
-    /* Стили маркера */
-    .sos-marker { background: transparent; border: none; }
-    .sos-marker::before {
-        content: ''; position: absolute; left: -10px; top: -10px; width: 40px; height: 40px;
-        background-color: rgba(239, 68, 68, 0.5); border-radius: 50%;
-        animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    /* Улучшенный маркер SOS */
+    .sos-marker {
+        background: transparent;
+        border: none;
     }
-    .sos-marker::after {
-        content: ''; position: absolute; left: 0; top: 0; width: 20px; height: 20px;
-        background-color: #ef4444; border: 2px solid white; border-radius: 50%;
-        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+
+    .sos-marker-container {
+        position: relative;
+        width: 60px;
+        height: 60px;
     }
-    @keyframes pulse-ring {
-        0% { transform: scale(0.33); opacity: 1; }
-        80%, 100% { transform: scale(2); opacity: 0; }
+
+    .sos-marker-pulse {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle, rgba(239, 68, 68, 0.6) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: sos-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .sos-marker-dot {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: 4px solid white;
+        border-radius: 50%;
+        box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5), 0 0 0 4px rgba(239, 68, 68, 0.2);
+    }
+
+    @keyframes sos-pulse {
+        0% {
+            transform: scale(0.5);
+            opacity: 1;
+        }
+        70%, 100% {
+            transform: scale(2.5);
+            opacity: 0;
+        }
+    }
+
+    /* Стили popup */
+    .leaflet-popup-content-wrapper {
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .leaflet-popup-tip {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Scrollbar */
+    #events-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    #events-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    #events-list::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    #events-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
     }
 </style>
 
@@ -132,99 +289,193 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        console.log("Live Monitor Init...");
+        console.log("🚀 Live Monitor Init...");
 
-        // 1. Инициализация карты
+        // Инициализация карты
         const mapEl = document.getElementById('map');
         if (!mapEl) return;
 
-        const map = L.map('map').setView([41.311, 69.240], 12);
+        const map = L.map('map', {
+            zoomControl: true,
+            preferCanvas: true
+        }).setView([41.311, 69.240], 12);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
+        // Темная тема карты
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© CartoDB',
             maxZoom: 19
         }).addTo(map);
 
-        setTimeout(() => { map.invalidateSize(); }, 300);
+        setTimeout(() => {
+            map.invalidateSize();
+            document.getElementById('map-placeholder').style.display = 'none';
+        }, 300);
 
         const sosIcon = L.divIcon({
             className: 'sos-marker',
-            iconSize: [20, 20],
-            iconAnchor: [10, 10],
-            popupAnchor: [0, -10]
+            html: `
+                <div class="sos-marker-container">
+                    <div class="sos-marker-pulse"></div>
+                    <div class="sos-marker-pulse" style="animation-delay: 0.5s;"></div>
+                    <div class="sos-marker-dot"></div>
+                </div>
+            `,
+            iconSize: [60, 60],
+            iconAnchor: [30, 30],
+            popupAnchor: [0, -30]
         });
 
         const markers = {};
 
-        // Функция добавления маркера
+        // Функция добавления маркера с анимацией
         window.addMarker = function(event) {
             if (markers[event.event_uid]) return;
 
             const marker = L.marker([event.lat, event.lon], {icon: sosIcon})
                 .addTo(map)
                 .bindPopup(`
-                    <div class="text-center">
-                        <strong style="color: red;">${event.detected_type}</strong><br>
-                        ${event.user_phone}<br>
-                        <a href="/admin/sos/sosevent/${event.id}/change/" target="_blank" style="color:blue; text-decoration:underline;">Открыть</a>
+                    <div class="p-4 min-w-[280px] bg-gradient-to-br from-white to-gray-50">
+                        <div class="flex items-center gap-3 mb-4 pb-3 border-b border-gray-200">
+                            <div class="p-2 rounded-lg bg-red-100">
+                                <span class="material-symbols-outlined text-red-600 text-xl">emergency</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-red-600 text-sm uppercase tracking-wide">
+                                    ${event.detected_type}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">Активный вызов</div>
+                            </div>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                <span class="material-symbols-outlined text-base">person</span>
+                                <span class="font-semibold">${event.user_phone}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <span class="material-symbols-outlined text-sm">schedule</span>
+                                <span>Только что</span>
+                            </div>
+                        </div>
+                        <a href="/admin/sos/sosevent/${event.id}/change/"
+                           target="_blank"
+                           class="block w-full py-2.5 px-4 text-center bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold rounded-lg hover:from-red-700 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl">
+                            <span class="flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                                Открыть детали
+                            </span>
+                        </a>
                     </div>
                 `);
 
             markers[event.event_uid] = true;
 
-            // Обновление списка
+            // Обновление списка с анимацией
             const list = document.getElementById('events-list');
-            const emptyMsg = list.querySelector('.text-center');
+            const emptyMsg = list.querySelector('.flex.flex-col.items-center');
             if(emptyMsg) emptyMsg.remove();
 
             const item = document.createElement('div');
-            item.className = "p-3 rounded border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 cursor-pointer border-t border-r border-b border-red-200 dark:border-red-800 mb-2 animate-pulse";
+            item.className = "group relative overflow-hidden rounded-xl border-l-4 border-red-500 bg-gradient-to-r from-red-50 to-white cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 mb-3 animate-slideInRight";
             item.innerHTML = `
-                <div class="flex justify-between items-start mb-1">
-                    <span class="text-xs font-bold text-red-600">NEW: ${event.detected_type}</span>
-                    <span class="text-xs text-gray-500">Just now</span>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="p-1.5 rounded-lg bg-red-100 animate-pulse">
+                                <span class="material-symbols-outlined text-red-600 text-sm">emergency</span>
+                            </div>
+                            <span class="text-xs font-bold text-red-700 uppercase tracking-wide">
+                                NEW: ${event.detected_type}
+                            </span>
+                        </div>
+                        <span class="text-xs text-gray-400 font-mono">Сейчас</span>
+                    </div>
+                    <div class="text-base font-bold text-gray-900 mb-1">${event.user_phone}</div>
+                    <div class="flex items-center justify-between pt-3 border-t border-red-100">
+                        <div class="flex items-center gap-1 text-xs text-gray-500">
+                            <span class="material-symbols-outlined text-sm">location_on</span>
+                            <span>Координаты получены</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-xs font-semibold text-red-600">
+                            <div class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
+                            <span>Активно</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-sm font-medium text-gray-900 dark:text-white">${event.user_phone}</div>
             `;
-            item.onclick = () => map.setView([event.lat, event.lon], 16);
+            item.onclick = () => map.flyTo([event.lat, event.lon], 16, { duration: 1.5 });
             list.prepend(item);
 
-            // Звук
+            // Звуковое уведомление
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
-                oscillator.connect(audioContext.destination);
-                oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
                 oscillator.start();
                 oscillator.stop(audioContext.currentTime + 0.5);
-            } catch(e) {}
+            } catch(e) {
+                console.warn('Audio notification failed:', e);
+            }
 
-            map.setView([event.lat, event.lon], 16);
+            map.flyTo([event.lat, event.lon], 16, { duration: 1.5 });
         };
 
         window.focusMap = function(lat, lon) {
-            map.flyTo([lat, lon], 16, { duration: 1.5 });
+            map.flyTo([lat, lon], 16, { duration: 1.5, easeLinearity: 0.25 });
         };
 
-        // Рендеринг существующих
+        // Рендеринг существующих событий
         {% for event in active_events %}
-            L.marker([{{ event.latlon.y|stringformat:'f' }}, {{ event.latlon.x|stringformat:'f' }}], {icon: sosIcon})
-             .addTo(map)
-             .bindPopup(`
-                <div style="text-align: center;">
-                    <strong style="color: red;">{{ event.detected_type }}</strong><br>
-                    {{ event.user.phone_number }}<br>
-                    <a href="/admin/sos/sosevent/{{ event.id }}/change/" target="_blank" style="color:blue; text-decoration:underline;">Открыть</a>
+            L.marker(
+                [{{ event.latlon.y|stringformat:'f' }}, {{ event.latlon.x|stringformat:'f' }}],
+                {icon: sosIcon}
+            ).addTo(map).bindPopup(`
+                <div class="p-4 min-w-[280px] bg-gradient-to-br from-white to-gray-50">
+                    <div class="flex items-center gap-3 mb-4 pb-3 border-b border-gray-200">
+                        <div class="p-2 rounded-lg bg-red-100">
+                            <span class="material-symbols-outlined text-red-600 text-xl">emergency</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-red-600 text-sm uppercase tracking-wide">
+                                {{ event.detected_type }}
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">Активный вызов</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-700">
+                            <span class="material-symbols-outlined text-base">person</span>
+                            <span class="font-semibold">{{ event.user.phone_number }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                            <span class="material-symbols-outlined text-sm">schedule</span>
+                            <span>{{ event.timestamp|date:"H:i" }}</span>
+                        </div>
+                    </div>
+                    <a href="/admin/sos/sosevent/{{ event.id }}/change/"
+                       target="_blank"
+                       class="block w-full py-2.5 px-4 text-center bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold rounded-lg hover:from-red-700 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl">
+                        <span class="flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">open_in_new</span>
+                            Открыть детали
+                        </span>
+                    </a>
                 </div>
-             `);
+            `);
             markers['{{ event.event_uid }}'] = true;
         {% endfor %}
 
-        // WebSocket
+        // WebSocket подключение
         const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         const wsUrl = protocol + window.location.host + '/ws/sos_events/';
         const statusDiv = document.getElementById('connection-status');
-        const pingDot = document.getElementById('ping-dot');
         const lastUpdateDiv = document.getElementById('last-update');
 
         let socket;
@@ -233,23 +484,43 @@
             socket = new WebSocket(wsUrl);
 
             socket.onopen = () => {
-                statusDiv.textContent = "ONLINE";
-                statusDiv.className = "px-3 py-1 rounded text-xs font-bold bg-green-100 text-green-800 border border-green-200";
-                pingDot.classList.remove('hidden');
+                console.log('✅ WebSocket connected');
+                statusDiv.innerHTML = `
+                    <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                    <span class="text-xs font-bold text-green-100">ONLINE</span>
+                `;
+                statusDiv.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/20 backdrop-blur-md border border-green-400/30";
             };
 
             socket.onmessage = (e) => {
                 const data = JSON.parse(e.data);
+                console.log('📨 Received:', data);
+
                 if (data.type === 'sos_event') {
                     addMarker(data.payload);
-                    lastUpdateDiv.textContent = "Last: " + new Date().toLocaleTimeString();
+
+                    const now = new Date();
+                    lastUpdateDiv.innerHTML = `
+                        <span class="material-symbols-outlined text-white text-sm">schedule</span>
+                        <span class="text-xs text-white font-mono">
+                            ${now.toLocaleTimeString('ru-RU')}
+                        </span>
+                    `;
                 }
             };
 
+            socket.onerror = (error) => {
+                console.error('❌ WebSocket error:', error);
+            };
+
             socket.onclose = () => {
-                statusDiv.textContent = "OFFLINE";
-                statusDiv.className = "px-3 py-1 rounded text-xs font-bold bg-red-100 text-red-800 border border-red-200";
-                pingDot.classList.add('hidden');
+                console.log('⚠️ WebSocket disconnected');
+                statusDiv.innerHTML = `
+                    <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                    <span class="text-xs font-bold text-red-100">OFFLINE</span>
+                `;
+                statusDiv.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 backdrop-blur-md border border-red-400/30";
+
                 setTimeout(connectWs, 3000);
             };
         }

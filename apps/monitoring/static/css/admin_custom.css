@@ -1,6 +1,19 @@
 /* apps/monitoring/static/css/admin_custom.css */
 
-/* --- 1. Поля ввода (Только светлая тема) --- */
+/* --- Импорт современного шрифта --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* --- Глобальные стили --- */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* --- Принудительная светлая тема --- */
+html, body {
+    background-color: #f8fafc !important;
+}
+
+/* --- Поля ввода с улучшенным дизайном --- */
 input[type="text"],
 input[type="password"],
 input[type="email"],
@@ -12,15 +25,106 @@ textarea,
 select,
 .select2-selection {
     background-color: #ffffff !important;
-    color: #111827 !important; /* gray-900 */
-    border: 1px solid #d1d5db !important; /* gray-300 */
+    color: #1f2937 !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Фикс плейсхолдеров */
-::placeholder { color: #9ca3af !important; opacity: 1; }
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #8b5cf6 !important;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1) !important;
+    outline: none !important;
+}
 
-/* --- 2. Карта (Leaflet) --- */
-/* Запрещаем Tailwind сжимать картинки карты */
+/* Плейсхолдеры */
+::placeholder {
+    color: #9ca3af !important;
+    opacity: 1;
+}
+
+/* --- Кнопки с градиентами --- */
+button[type="submit"],
+.submit-row input[type="submit"],
+.button,
+.btn-primary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+}
+
+button[type="submit"]:hover,
+.submit-row input[type="submit"]:hover,
+.button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* --- Карточки с современными тенями --- */
+.card,
+.module,
+.results,
+form {
+    background: white !important;
+    border-radius: 16px !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+.card:hover,
+.module:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* --- Таблицы --- */
+table {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+thead th {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    color: #475569 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 11px !important;
+    letter-spacing: 0.5px !important;
+    padding: 16px !important;
+}
+
+tbody tr {
+    transition: all 0.2s ease !important;
+}
+
+tbody tr:hover {
+    background: #f8fafc !important;
+    transform: scale(1.01) !important;
+}
+
+/* --- Бейджи и теги --- */
+.badge,
+.tag {
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+}
+
+/* --- Карта (Leaflet) --- */
+.leaflet-container {
+    border-radius: 16px !important;
+}
+
 .leaflet-container img.leaflet-tile,
 .leaflet-container img.leaflet-marker-icon,
 .leaflet-container img.leaflet-marker-shadow {
@@ -30,7 +134,6 @@ select,
     height: auto !important;
 }
 
-/* Возвращаем слоям карты нормальное позиционирование */
 .leaflet-pane,
 .leaflet-tile,
 .leaflet-marker-icon,
@@ -46,7 +149,232 @@ select,
     top: 0;
 }
 
-/* Скрываем кнопку темы, если JS не успел */
+/* Контролы карты */
+.leaflet-control-zoom a {
+    background: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background: #f8fafc !important;
+    transform: scale(1.1) !important;
+}
+
+/* --- Сайдбар админки --- */
+#sidebar {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+    border-right: 1px solid #e5e7eb !important;
+}
+
+#sidebar a {
+    border-radius: 12px !important;
+    margin: 4px 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+#sidebar a:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    color: white !important;
+    transform: translateX(4px) !important;
+}
+
+/* --- Хедер --- */
+#header {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* --- Анимации --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+    border-radius: 10px;
+    border: 3px solid #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+/* --- Уведомления --- */
+.messagelist li {
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    margin: 12px 0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.messagelist li.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-left: 4px solid #047857 !important;
+}
+
+.messagelist li.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border-left: 4px solid #b91c1c !important;
+}
+
+.messagelist li.warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    border-left: 4px solid #b45309 !important;
+}
+
+/* --- Модальные окна --- */
+.modal {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    color: white !important;
+    padding: 20px !important;
+}
+
+/* --- Кнопка удаления темы (скрываем) --- */
 button[data-action="theme-toggle"] {
     display: none !important;
+}
+
+/* --- Прогресс-бары --- */
+.progress {
+    height: 8px !important;
+    border-radius: 4px !important;
+    background: #e5e7eb !important;
+    overflow: hidden !important;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    transition: width 0.6s ease !important;
+}
+
+/* --- Хлебные крошки --- */
+.breadcrumbs {
+    background: transparent !important;
+    padding: 16px 0 !important;
+}
+
+.breadcrumbs a {
+    color: #6b7280 !important;
+    transition: color 0.3s ease !important;
+}
+
+.breadcrumbs a:hover {
+    color: #8b5cf6 !important;
+}
+
+/* --- Формы (улучшенные) --- */
+.form-row {
+    margin-bottom: 20px !important;
+}
+
+.form-row label {
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+/* --- Статус индикаторы --- */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-online {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-offline {
+    background: rgba(107, 114, 128, 0.1);
+    color: #4b5563;
+    border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.status-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.status-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* --- Glassmorphism эффект --- */
+.glass {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* --- Тени для глубины --- */
+.shadow-soft {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.shadow-medium {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+}
+
+.shadow-hard {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* --- Анимированные градиенты --- */
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.gradient-animated {
+    background-size: 200% 200% !important;
+    animation: gradient-shift 4s ease infinite !important;
 }
