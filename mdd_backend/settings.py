@@ -67,108 +67,33 @@ INSTALLED_APPS = [
 ]
 
 UNFOLD = {
-    "SITE_TITLE": "MDD Dispatcher",
-    "SITE_HEADER": "Man Down Detection Platform",
+    "SITE_TITLE": "MDD Admin",
+    "SITE_HEADER": "Man Down Detection",
     "SITE_URL": "/",
 
-    # Подключаем кастомные стили и скрипты
-    "STYLES": [
-        lambda request: static("css/admin_custom.css"),
-    ],
-    "SCRIPTS": [
-        lambda request: static("js/admin_custom.js"),
-    ],
-
-    # Современная цветовая палитра (Violet/Purple)
-    "COLORS": {
-        "primary": {
-            "50": "250 245 255",   # violet-50
-            "100": "243 232 255",  # violet-100
-            "200": "233 213 255",  # violet-200
-            "300": "216 180 254",  # violet-300
-            "400": "192 132 252",  # violet-400
-            "500": "168 85 247",   # violet-500
-            "600": "147 51 234",   # violet-600
-            "700": "126 34 206",   # violet-700
-            "800": "107 33 168",   # violet-800
-            "900": "88 28 135",    # violet-900
-            "950": "59 7 100",     # violet-950
-        },
-    },
-
-    # Настройка сайдбара
     "SIDEBAR": {
         "show_search": True,
-        "show_all_applications": False,
+        "show_all_applications": True,
         "navigation": [
             {
-                "title": "Оперативный центр",
+                "title": "Navigation",
                 "separator": True,
-                "collapsible": False,
                 "items": [
                     {
-                        "title": "Главный Дашборд",
+                        "title": "Dashboard",
                         "icon": "dashboard",
                         "link": reverse_lazy("admin:index"),
                     },
                     {
-                        "title": "Live Мониторинг",
+                        "title": "Live Monitor",
                         "icon": "emergency",
                         "link": reverse_lazy("live-monitor"),
                         "badge": "apps.monitoring.dashboard.badge_active_sos",
                     },
                 ],
             },
-            {
-                "title": "Управление",
-                "separator": True,
-                "collapsible": False,
-                "items": [
-                    {
-                        "title": "SOS Сигналы",
-                        "icon": "notifications_active",
-                        "link": reverse_lazy("admin:sos_sosevent_changelist"),
-                        "badge": "apps.monitoring.dashboard.badge_active_sos",
-                    },
-                    {
-                        "title": "Устройства",
-                        "icon": "watch",
-                        "link": reverse_lazy("admin:devices_device_changelist"),
-                    },
-                    {
-                        "title": "Пользователи",
-                        "icon": "people",
-                        "link": reverse_lazy("admin:users_user_changelist"),
-                    },
-                ],
-            },
-            {
-                "title": "Система",
-                "separator": True,
-                "collapsible": True,
-                "items": [
-                    {
-                        "title": "Настройки",
-                        "icon": "settings",
-                        "link": reverse_lazy("admin:monitoring_settingsconfig_changelist"),
-                    },
-                    {
-                        "title": "Метрики",
-                        "icon": "analytics",
-                        "link": "/metrics/",
-                    },
-                    {
-                        "title": "API Документация",
-                        "icon": "code",
-                        "link": "/swagger/",
-                    },
-                ],
-            },
         ],
     },
-
-    # Callback для дашборда
-    "DASHBOARD_CALLBACK": "apps.monitoring.dashboard.dashboard_callback",
 }
 
 MIDDLEWARE = [

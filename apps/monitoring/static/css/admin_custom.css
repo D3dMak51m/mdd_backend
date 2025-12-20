@@ -1,380 +1,546 @@
-/* apps/monitoring/static/css/admin_custom.css */
+/*!* apps/monitoring/static/css/admin_custom.css *!*/
 
-/* --- Импорт современного шрифта --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/*!* --- Импорт современного шрифта --- *!*/
+/*@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');*/
 
-/* --- Глобальные стили --- */
-* {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
+/*!* --- Material Symbols Icons --- *!*/
+/*.material-symbols-outlined {*/
+/*    font-family: 'Material Symbols Outlined';*/
+/*    font-weight: normal;*/
+/*    font-style: normal;*/
+/*    font-size: 24px;*/
+/*    line-height: 1;*/
+/*    letter-spacing: normal;*/
+/*    text-transform: none;*/
+/*    display: inline-block;*/
+/*    white-space: nowrap;*/
+/*    word-wrap: normal;*/
+/*    direction: ltr;*/
+/*    -webkit-font-smoothing: antialiased;*/
+/*    -moz-osx-font-smoothing: grayscale;*/
+/*    text-rendering: optimizeLegibility;*/
+/*    font-feature-settings: 'liga';*/
+/*}*/
 
-/* --- Принудительная светлая тема --- */
-html, body {
-    background-color: #f8fafc !important;
-}
+/*!* --- Глобальные стили --- *!*/
+/** {*/
+/*    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;*/
+/*}*/
 
-/* --- Поля ввода с улучшенным дизайном --- */
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-input[type="url"],
-input[type="date"],
-input[type="datetime-local"],
-textarea,
-select,
-.select2-selection {
-    background-color: #ffffff !important;
-    color: #1f2937 !important;
-    border: 2px solid #e5e7eb !important;
-    border-radius: 12px !important;
-    padding: 12px 16px !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-}
+/*!* --- Принудительная светлая тема --- *!*/
+/*html, body {*/
+/*    background-color: #f8fafc !important;*/
+/*}*/
 
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: #8b5cf6 !important;
-    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1) !important;
-    outline: none !important;
-}
+/*!* --- Поля ввода с улучшенным дизайном --- *!*/
+/*input[type="text"],*/
+/*input[type="password"],*/
+/*input[type="email"],*/
+/*input[type="number"],*/
+/*input[type="url"],*/
+/*input[type="date"],*/
+/*input[type="datetime-local"],*/
+/*textarea,*/
+/*select,*/
+/*.select2-selection {*/
+/*    background-color: #ffffff !important;*/
+/*    color: #1f2937 !important;*/
+/*    border: 2px solid #e5e7eb !important;*/
+/*    border-radius: 12px !important;*/
+/*    padding: 12px 16px !important;*/
+/*    transition: all 0.3s ease !important;*/
+/*    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;*/
+/*}*/
 
-/* Плейсхолдеры */
-::placeholder {
-    color: #9ca3af !important;
-    opacity: 1;
-}
+/*input:focus,*/
+/*textarea:focus,*/
+/*select:focus {*/
+/*    border-color: #8b5cf6 !important;*/
+/*    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1) !important;*/
+/*    outline: none !important;*/
+/*}*/
 
-/* --- Кнопки с градиентами --- */
-button[type="submit"],
-.submit-row input[type="submit"],
-.button,
-.btn-primary {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 12px !important;
-    padding: 12px 24px !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
-}
+/*!* Плейсхолдеры *!*/
+/*::placeholder {*/
+/*    color: #9ca3af !important;*/
+/*    opacity: 1;*/
+/*}*/
 
-button[type="submit"]:hover,
-.submit-row input[type="submit"]:hover,
-.button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
-}
+/*!* --- Кнопки с градиентами --- *!*/
+/*button[type="submit"],*/
+/*.submit-row input[type="submit"],*/
+/*.button,*/
+/*.btn-primary {*/
+/*    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;*/
+/*    color: white !important;*/
+/*    border: none !important;*/
+/*    border-radius: 12px !important;*/
+/*    padding: 12px 24px !important;*/
+/*    font-weight: 600 !important;*/
+/*    transition: all 0.3s ease !important;*/
+/*    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;*/
+/*}*/
 
-/* --- Карточки с современными тенями --- */
-.card,
-.module,
-.results,
-form {
-    background: white !important;
-    border-radius: 16px !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-    transition: all 0.3s ease !important;
-}
+/*button[type="submit"]:hover,*/
+/*.submit-row input[type="submit"]:hover,*/
+/*.button:hover {*/
+/*    transform: translateY(-2px) !important;*/
+/*    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;*/
+/*}*/
 
-.card:hover,
-.module:hover {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
-}
+/*!* --- Карточки с современными тенями --- *!*/
+/*.card,*/
+/*.module,*/
+/*.results,*/
+/*form {*/
+/*    background: white !important;*/
+/*    border-radius: 16px !important;*/
+/*    border: 1px solid #e5e7eb !important;*/
+/*    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;*/
+/*    transition: all 0.3s ease !important;*/
+/*}*/
 
-/* --- Таблицы --- */
-table {
-    border-radius: 12px !important;
-    overflow: hidden !important;
-}
+/*.card:hover,*/
+/*.module:hover {*/
+/*    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;*/
+/*}*/
 
-thead th {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-    color: #475569 !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    font-size: 11px !important;
-    letter-spacing: 0.5px !important;
-    padding: 16px !important;
-}
+/*!* --- Таблицы --- *!*/
+/*table {*/
+/*    border-radius: 12px !important;*/
+/*    overflow: hidden !important;*/
+/*}*/
 
-tbody tr {
-    transition: all 0.2s ease !important;
-}
+/*thead th {*/
+/*    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;*/
+/*    color: #475569 !important;*/
+/*    font-weight: 700 !important;*/
+/*    text-transform: uppercase !important;*/
+/*    font-size: 11px !important;*/
+/*    letter-spacing: 0.5px !important;*/
+/*    padding: 16px !important;*/
+/*}*/
 
-tbody tr:hover {
-    background: #f8fafc !important;
-    transform: scale(1.01) !important;
-}
+/*tbody tr {*/
+/*    transition: all 0.2s ease !important;*/
+/*}*/
 
-/* --- Бейджи и теги --- */
-.badge,
-.tag {
-    border-radius: 8px !important;
-    padding: 6px 12px !important;
-    font-weight: 600 !important;
-    font-size: 12px !important;
-}
+/*tbody tr:hover {*/
+/*    background: #f8fafc !important;*/
+/*    transform: scale(1.01) !important;*/
+/*}*/
 
-/* --- Карта (Leaflet) --- */
-.leaflet-container {
-    border-radius: 16px !important;
-}
+/*!* --- Бейджи и теги --- *!*/
+/*.badge,*/
+/*.tag {*/
+/*    border-radius: 8px !important;*/
+/*    padding: 6px 12px !important;*/
+/*    font-weight: 600 !important;*/
+/*    font-size: 12px !important;*/
+/*}*/
 
-.leaflet-container img.leaflet-tile,
-.leaflet-container img.leaflet-marker-icon,
-.leaflet-container img.leaflet-marker-shadow {
-    max-width: none !important;
-    max-height: none !important;
-    width: auto !important;
-    height: auto !important;
-}
+/*!* --- Карта (Leaflet) --- *!*/
+/*.leaflet-container {*/
+/*    border-radius: 16px !important;*/
+/*}*/
 
-.leaflet-pane,
-.leaflet-tile,
-.leaflet-marker-icon,
-.leaflet-marker-shadow,
-.leaflet-tile-container,
-.leaflet-pane > svg,
-.leaflet-pane > canvas,
-.leaflet-zoom-box,
-.leaflet-image-layer,
-.leaflet-layer {
-    position: absolute !important;
-    left: 0;
-    top: 0;
-}
+/*.leaflet-container img.leaflet-tile,*/
+/*.leaflet-container img.leaflet-marker-icon,*/
+/*.leaflet-container img.leaflet-marker-shadow {*/
+/*    max-width: none !important;*/
+/*    max-height: none !important;*/
+/*    width: auto !important;*/
+/*    height: auto !important;*/
+/*}*/
 
-/* Контролы карты */
-.leaflet-control-zoom a {
-    background: white !important;
-    border: none !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-    transition: all 0.3s ease !important;
-}
+/*.leaflet-pane,*/
+/*.leaflet-tile,*/
+/*.leaflet-marker-icon,*/
+/*.leaflet-marker-shadow,*/
+/*.leaflet-tile-container,*/
+/*.leaflet-pane > svg,*/
+/*.leaflet-pane > canvas,*/
+/*.leaflet-zoom-box,*/
+/*.leaflet-image-layer,*/
+/*.leaflet-layer {*/
+/*    position: absolute !important;*/
+/*    left: 0;*/
+/*    top: 0;*/
+/*}*/
 
-.leaflet-control-zoom a:hover {
-    background: #f8fafc !important;
-    transform: scale(1.1) !important;
-}
+/*!* Контролы карты *!*/
+/*.leaflet-control-zoom a {*/
+/*    background: white !important;*/
+/*    border: none !important;*/
+/*    border-radius: 8px !important;*/
+/*    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;*/
+/*    transition: all 0.3s ease !important;*/
+/*}*/
 
-/* --- Сайдбар админки --- */
-#sidebar {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-    border-right: 1px solid #e5e7eb !important;
-}
+/*.leaflet-control-zoom a:hover {*/
+/*    background: #f8fafc !important;*/
+/*    transform: scale(1.1) !important;*/
+/*}*/
 
-#sidebar a {
-    border-radius: 12px !important;
-    margin: 4px 8px !important;
-    transition: all 0.3s ease !important;
-}
+/*!* --- Сайдбар админки --- *!*/
+/*#sidebar {*/
+/*    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;*/
+/*    border-right: 1px solid #e5e7eb !important;*/
+/*}*/
 
-#sidebar a:hover {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
-    color: white !important;
-    transform: translateX(4px) !important;
-}
+/*#sidebar a {*/
+/*    border-radius: 12px !important;*/
+/*    margin: 4px 8px !important;*/
+/*    transition: all 0.3s ease !important;*/
+/*}*/
 
-/* --- Хедер --- */
-#header {
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
-}
+/*#sidebar a:hover {*/
+/*    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;*/
+/*    color: white !important;*/
+/*    transform: translateX(4px) !important;*/
+/*}*/
 
-/* --- Анимации --- */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+/*!* --- Хедер --- *!*/
+/*#header {*/
+/*    background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;*/
+/*    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;*/
+/*}*/
 
-.animate-fadeIn {
-    animation: fadeIn 0.5s ease-out;
-}
+/*!* --- Анимации --- *!*/
+/*@keyframes fadeIn {*/
+/*    from {*/
+/*        opacity: 0;*/
+/*        transform: translateY(10px);*/
+/*    }*/
+/*    to {*/
+/*        opacity: 1;*/
+/*        transform: translateY(0);*/
+/*    }*/
+/*}*/
 
-/* --- Scrollbar --- */
-::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-}
+/*.animate-fadeIn {*/
+/*    animation: fadeIn 0.5s ease-out;*/
+/*}*/
 
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 10px;
-}
+/*!* --- Scrollbar --- *!*/
+/*::-webkit-scrollbar {*/
+/*    width: 12px;*/
+/*    height: 12px;*/
+/*}*/
 
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
-    border-radius: 10px;
-    border: 3px solid #f1f5f9;
-}
+/*::-webkit-scrollbar-track {*/
+/*    background: #f1f5f9;*/
+/*    border-radius: 10px;*/
+/*}*/
 
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
-}
+/*::-webkit-scrollbar-thumb {*/
+/*    background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);*/
+/*    border-radius: 10px;*/
+/*    border: 3px solid #f1f5f9;*/
+/*}*/
 
-/* --- Уведомления --- */
-.messagelist li {
-    border-radius: 12px !important;
-    padding: 16px 20px !important;
-    margin: 12px 0 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-}
+/*::-webkit-scrollbar-thumb:hover {*/
+/*    background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);*/
+/*}*/
 
-.messagelist li.success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    border-left: 4px solid #047857 !important;
-}
+/*!* --- Уведомления --- *!*/
+/*.messagelist li {*/
+/*    border-radius: 12px !important;*/
+/*    padding: 16px 20px !important;*/
+/*    margin: 12px 0 !important;*/
+/*    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;*/
+/*}*/
 
-.messagelist li.error {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    border-left: 4px solid #b91c1c !important;
-}
+/*.messagelist li.success {*/
+/*    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;*/
+/*    border-left: 4px solid #047857 !important;*/
+/*}*/
 
-.messagelist li.warning {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-    border-left: 4px solid #b45309 !important;
-}
+/*.messagelist li.error {*/
+/*    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;*/
+/*    border-left: 4px solid #b91c1c !important;*/
+/*}*/
 
-/* --- Модальные окна --- */
-.modal {
-    border-radius: 16px !important;
-    overflow: hidden !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
-}
+/*.messagelist li.warning {*/
+/*    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;*/
+/*    border-left: 4px solid #b45309 !important;*/
+/*}*/
 
-.modal-header {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
-    color: white !important;
-    padding: 20px !important;
-}
+/*!* --- Модальные окна --- *!*/
+/*.modal {*/
+/*    border-radius: 16px !important;*/
+/*    overflow: hidden !important;*/
+/*    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;*/
+/*}*/
 
-/* --- Кнопка удаления темы (скрываем) --- */
-button[data-action="theme-toggle"] {
-    display: none !important;
-}
+/*.modal-header {*/
+/*    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;*/
+/*    color: white !important;*/
+/*    padding: 20px !important;*/
+/*}*/
 
-/* --- Прогресс-бары --- */
-.progress {
-    height: 8px !important;
-    border-radius: 4px !important;
-    background: #e5e7eb !important;
-    overflow: hidden !important;
-}
+/*!* --- Принудительная светлая тема --- *!*/
+/*html {*/
+/*    color-scheme: light !important;*/
+/*}*/
 
-.progress-bar {
-    background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%) !important;
-    transition: width 0.6s ease !important;
-}
+/*html.dark,*/
+/*html[data-theme="dark"] {*/
+/*    color-scheme: light !important;*/
+/*}*/
 
-/* --- Хлебные крошки --- */
-.breadcrumbs {
-    background: transparent !important;
-    padding: 16px 0 !important;
-}
+/*!* Скрываем переключатель темы *!*/
+/*button[data-action="theme-toggle"],*/
+/*[data-theme-toggle],*/
+/*.theme-toggle,*/
+/*button[aria-label*="theme"],*/
+/*button[aria-label*="Theme"] {*/
+/*    display: none !important;*/
+/*    visibility: hidden !important;*/
+/*    opacity: 0 !important;*/
+/*    pointer-events: none !important;*/
+/*}*/
 
-.breadcrumbs a {
-    color: #6b7280 !important;
-    transition: color 0.3s ease !important;
-}
+/*!* Принудительно светлые цвета для всех элементов *!*/
+/*body,*/
+/*.bg-gray-900,*/
+/*.bg-slate-900,*/
+/*.dark\:bg-gray-900,*/
+/*.dark\:bg-slate-900 {*/
+/*    background-color: #ffffff !important;*/
+/*    color: #111827 !important;*/
+/*}*/
 
-.breadcrumbs a:hover {
-    color: #8b5cf6 !important;
-}
+/*!* --- Прогресс-бары --- *!*/
+/*.progress {*/
+/*    height: 8px !important;*/
+/*    border-radius: 4px !important;*/
+/*    background: #e5e7eb !important;*/
+/*    overflow: hidden !important;*/
+/*}*/
 
-/* --- Формы (улучшенные) --- */
-.form-row {
-    margin-bottom: 20px !important;
-}
+/*.progress-bar {*/
+/*    background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%) !important;*/
+/*    transition: width 0.6s ease !important;*/
+/*}*/
 
-.form-row label {
-    font-weight: 600 !important;
-    color: #374151 !important;
-    margin-bottom: 8px !important;
-    display: block !important;
-}
+/*!* --- Хлебные крошки --- *!*/
+/*.breadcrumbs {*/
+/*    background: transparent !important;*/
+/*    padding: 16px 0 !important;*/
+/*}*/
 
-/* --- Статус индикаторы --- */
-.status-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 9999px;
-    font-size: 12px;
-    font-weight: 600;
-}
+/*.breadcrumbs a {*/
+/*    color: #6b7280 !important;*/
+/*    transition: color 0.3s ease !important;*/
+/*}*/
 
-.status-online {
-    background: rgba(16, 185, 129, 0.1);
-    color: #059669;
-    border: 1px solid rgba(16, 185, 129, 0.2);
-}
+/*.breadcrumbs a:hover {*/
+/*    color: #8b5cf6 !important;*/
+/*}*/
 
-.status-offline {
-    background: rgba(107, 114, 128, 0.1);
-    color: #4b5563;
-    border: 1px solid rgba(107, 114, 128, 0.2);
-}
+/*!* --- Формы (улучшенные) --- *!*/
+/*.form-row {*/
+/*    margin-bottom: 20px !important;*/
+/*}*/
 
-.status-warning {
-    background: rgba(245, 158, 11, 0.1);
-    color: #d97706;
-    border: 1px solid rgba(245, 158, 11, 0.2);
-}
+/*.form-row label {*/
+/*    font-weight: 600 !important;*/
+/*    color: #374151 !important;*/
+/*    margin-bottom: 8px !important;*/
+/*    display: block !important;*/
+/*    font-size: 14px !important;*/
+/*}*/
 
-.status-danger {
-    background: rgba(239, 68, 68, 0.1);
-    color: #dc2626;
-    border: 1px solid rgba(239, 68, 68, 0.2);
-}
+/*!* Улучшенные поля формы *!*/
+/*.form-row input[type="text"],*/
+/*.form-row input[type="password"],*/
+/*.form-row input[type="email"],*/
+/*.form-row input[type="number"],*/
+/*.form-row input[type="tel"],*/
+/*.form-row input[type="datetime-local"],*/
+/*.form-row select,*/
+/*.form-row textarea {*/
+/*    width: 100% !important;*/
+/*    max-width: 600px !important;*/
+/*}*/
 
-/* --- Glassmorphism эффект --- */
-.glass {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-}
+/*!* Чекбоксы и радио *!*/
+/*.form-row input[type="checkbox"],*/
+/*.form-row input[type="radio"] {*/
+/*    width: auto !important;*/
+/*    margin-right: 8px !important;*/
+/*}*/
 
-/* --- Тени для глубины --- */
-.shadow-soft {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
-}
+/*!* Группы полей *!*/
+/*.fieldset {*/
+/*    background: #f9fafb !important;*/
+/*    border-radius: 12px !important;*/
+/*    padding: 20px !important;*/
+/*    margin-bottom: 24px !important;*/
+/*    border: 1px solid #e5e7eb !important;*/
+/*}*/
 
-.shadow-medium {
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
-}
+/*.fieldset legend {*/
+/*    font-weight: 700 !important;*/
+/*    font-size: 16px !important;*/
+/*    color: #111827 !important;*/
+/*    padding: 0 12px !important;*/
+/*    margin-bottom: 16px !important;*/
+/*}*/
 
-.shadow-hard {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18) !important;
-}
+/*!* Inline формы *!*/
+/*.inline-related {*/
+/*    background: white !important;*/
+/*    border-radius: 12px !important;*/
+/*    padding: 16px !important;*/
+/*    margin-bottom: 16px !important;*/
+/*    border: 1px solid #e5e7eb !important;*/
+/*}*/
 
-/* --- Анимированные градиенты --- */
-@keyframes gradient-shift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
+/*!* Помощь *!*/
+/*.help {*/
+/*    font-size: 13px !important;*/
+/*    color: #6b7280 !important;*/
+/*    margin-top: 6px !important;*/
+/*    display: block !important;*/
+/*}*/
 
-.gradient-animated {
-    background-size: 200% 200% !important;
-    animation: gradient-shift 4s ease infinite !important;
-}
+/*!* Ошибки *!*/
+/*.errorlist {*/
+/*    background: #fee2e2 !important;*/
+/*    border: 1px solid #fca5a5 !important;*/
+/*    border-radius: 8px !important;*/
+/*    padding: 12px !important;*/
+/*    margin: 8px 0 !important;*/
+/*    color: #dc2626 !important;*/
+/*    font-size: 13px !important;*/
+/*}*/
+
+/*.errorlist li {*/
+/*    list-style: none !important;*/
+/*    padding: 4px 0 !important;*/
+/*}*/
+
+/*!* Права пользователя - улучшенный вид *!*/
+/*.selector {*/
+/*    background: white !important;*/
+/*    border-radius: 12px !important;*/
+/*    padding: 16px !important;*/
+/*    border: 1px solid #e5e7eb !important;*/
+/*}*/
+
+/*.selector select {*/
+/*    min-height: 200px !important;*/
+/*    background: white !important;*/
+/*    border: 2px solid #e5e7eb !important;*/
+/*    border-radius: 8px !important;*/
+/*    padding: 8px !important;*/
+/*}*/
+
+/*.selector-available h2,*/
+/*.selector-chosen h2 {*/
+/*    font-size: 14px !important;*/
+/*    font-weight: 600 !important;*/
+/*    color: #374151 !important;*/
+/*    margin-bottom: 12px !important;*/
+/*}*/
+
+/*!* Кнопки между селекторами *!*/
+/*.selector-chooser {*/
+/*    display: flex !important;*/
+/*    flex-direction: column !important;*/
+/*    gap: 8px !important;*/
+/*    padding: 0 16px !important;*/
+/*}*/
+
+/*.selector-chooser a {*/
+/*    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;*/
+/*    color: white !important;*/
+/*    padding: 8px 16px !important;*/
+/*    border-radius: 8px !important;*/
+/*    text-decoration: none !important;*/
+/*    text-align: center !important;*/
+/*    font-size: 20px !important;*/
+/*    transition: all 0.3s ease !important;*/
+/*    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;*/
+/*}*/
+
+/*.selector-chooser a:hover {*/
+/*    transform: scale(1.05) !important;*/
+/*    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4) !important;*/
+/*}*/
+
+/*!* --- Статус индикаторы --- *!*/
+/*.status-indicator {*/
+/*    display: inline-flex;*/
+/*    align-items: center;*/
+/*    gap: 8px;*/
+/*    padding: 6px 12px;*/
+/*    border-radius: 9999px;*/
+/*    font-size: 12px;*/
+/*    font-weight: 600;*/
+/*}*/
+
+/*.status-online {*/
+/*    background: rgba(16, 185, 129, 0.1);*/
+/*    color: #059669;*/
+/*    border: 1px solid rgba(16, 185, 129, 0.2);*/
+/*}*/
+
+/*.status-offline {*/
+/*    background: rgba(107, 114, 128, 0.1);*/
+/*    color: #4b5563;*/
+/*    border: 1px solid rgba(107, 114, 128, 0.2);*/
+/*}*/
+
+/*.status-warning {*/
+/*    background: rgba(245, 158, 11, 0.1);*/
+/*    color: #d97706;*/
+/*    border: 1px solid rgba(245, 158, 11, 0.2);*/
+/*}*/
+
+/*.status-danger {*/
+/*    background: rgba(239, 68, 68, 0.1);*/
+/*    color: #dc2626;*/
+/*    border: 1px solid rgba(239, 68, 68, 0.2);*/
+/*}*/
+
+/*!* --- Glassmorphism эффект --- *!*/
+/*.glass {*/
+/*    background: rgba(255, 255, 255, 0.8) !important;*/
+/*    backdrop-filter: blur(10px) !important;*/
+/*    -webkit-backdrop-filter: blur(10px) !important;*/
+/*    border: 1px solid rgba(255, 255, 255, 0.2) !important;*/
+/*}*/
+
+/*!* --- Тени для глубины --- *!*/
+/*.shadow-soft {*/
+/*    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;*/
+/*}*/
+
+/*.shadow-medium {*/
+/*    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;*/
+/*}*/
+
+/*.shadow-hard {*/
+/*    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18) !important;*/
+/*}*/
+
+/*!* --- Анимированные градиенты --- *!*/
+/*@keyframes gradient-shift {*/
+/*    0% {*/
+/*        background-position: 0% 50%;*/
+/*    }*/
+/*    50% {*/
+/*        background-position: 100% 50%;*/
+/*    }*/
+/*    100% {*/
+/*        background-position: 0% 50%;*/
+/*    }*/
+/*}*/
+
+/*.gradient-animated {*/
+/*    background-size: 200% 200% !important;*/
+/*    animation: gradient-shift 4s ease infinite !important;*/
+/*}*/
