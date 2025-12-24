@@ -64,7 +64,18 @@ INSTALLED_APPS = [
     'apps.sos',
     'apps.notifications',
     'apps.monitoring',
+    'apps.rbac',
+    'apps.audit',
+    'apps.analytics',
 ]
+
+# Расписание периодических задач
+CELERY_BEAT_SCHEDULE = {
+    'aggregate-stats-every-hour': {
+        'task': 'apps.analytics.tasks.aggregate_daily_stats_task',
+        'schedule': 3600.0, # Раз в час (или используйте crontab для запуска ночью)
+    },
+}
 
 UNFOLD = {
     "SITE_TITLE": "MDD Admin",
@@ -73,26 +84,7 @@ UNFOLD = {
 
     "SIDEBAR": {
         "show_search": True,
-        "show_all_applications": True,
-        "navigation": [
-            {
-                "title": "Navigation",
-                "separator": True,
-                "items": [
-                    {
-                        "title": "Dashboard",
-                        "icon": "dashboard",
-                        "link": reverse_lazy("admin:index"),
-                    },
-                    {
-                        "title": "Live Monitor",
-                        "icon": "emergency",
-                        "link": reverse_lazy("live-monitor"),
-                        "badge": "apps.monitoring.dashboard.badge_active_sos",
-                    },
-                ],
-            },
-        ],
+        "show_all_applications": True,  # Показывает ВСЕ модели автоматически
     },
 }
 
