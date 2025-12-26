@@ -4,33 +4,11 @@
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 15, 23, 42; /* Slate 900 */
-  --background-end-rgb: 2, 6, 23;     /* Slate 950 */
+  --background-start-rgb: 2, 6, 23; /* slate-950 */
+  --background-end-rgb: 2, 6, 23;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-  min-height: 100vh;
-}
-
-/* Скроллбар для Webkit (Chrome, Safari) */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #1e293b;
-}
-::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: rgb(var(--background-start-rgb));
 }

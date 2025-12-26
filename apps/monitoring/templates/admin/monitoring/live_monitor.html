@@ -5,534 +5,241 @@
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
-<div class="w-full bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-200" style="height: 85vh; min-height: 600px;">
+<div class="w-full bg-white dark:bg-gray-900 border dark:border-gray-700 shadow rounded-lg overflow-hidden flex flex-col" style="height: 85vh; min-height: 600px;">
 
-    <!-- Модернизированный хедер с градиентом -->
-    <div class="relative overflow-hidden bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 px-6 py-5 shrink-0">
-        <!-- Анимированный фон -->
-        <div class="absolute inset-0 bg-grid-white/[0.05] bg-[size:30px_30px]"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-transparent to-blue-500/20 animate-pulse-slow"></div>
-
-        <div class="relative flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <!-- Пульсирующий индикатор -->
-                <div class="relative">
-                    <div class="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
-                    <div class="relative flex h-4 w-4 rounded-full bg-red-500 shadow-lg shadow-red-500/50"></div>
-                </div>
-
-                <div>
-                    <h1 class="text-2xl font-bold text-white flex items-center gap-3">
-                        <span class="material-symbols-outlined text-3xl">emergency</span>
-                        ОПЕРАТИВНЫЙ МОНИТОРИНГ
-                    </h1>
-                    <p class="text-purple-200 text-sm mt-1">Real-time Emergency Response System</p>
-                </div>
-            </div>
-
-            <!-- Статус панель -->
-            <div class="flex items-center gap-4">
-                <div id="last-update" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
-                    <span class="material-symbols-outlined text-white text-sm">schedule</span>
-                    <span class="text-xs text-white font-mono">Ожидание...</span>
-                </div>
-
-                <div id="connection-status" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-500/20 backdrop-blur-md border border-yellow-400/30">
-                    <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
-                    <span class="text-xs font-bold text-yellow-100">Подключение...</span>
-                </div>
-            </div>
+    <!-- Хедер -->
+    <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800 shrink-0">
+        <h1 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <span class="relative flex h-3 w-3">
+              <span id="ping-dot" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 hidden"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+            ОПЕРАТИВНЫЙ МОНИТОРИНГ
+        </h1>
+        <div class="flex items-center gap-4">
+            <div id="last-update" class="text-xs text-gray-500 dark:text-gray-400 font-mono hidden sm:block">Ожидание...</div>
+            <div id="connection-status" class="px-3 py-1 rounded text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">Подключение...</div>
         </div>
     </div>
 
     <!-- Основной контент -->
     <div class="grid grid-cols-1 md:grid-cols-4 h-full flex-1 relative overflow-hidden">
 
-        <!-- Улучшенный сайдбар -->
-        <div class="col-span-1 bg-white/80 backdrop-blur-xl border-r border-gray-200 flex flex-col h-full overflow-hidden z-20 relative">
-            <!-- Заголовок ленты -->
-            <div class="px-4 py-4 bg-gradient-to-r from-red-500 to-orange-600 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-white text-xl">notifications_active</span>
-                    <span class="font-bold text-sm uppercase text-white tracking-wide">Активные вызовы</span>
-                </div>
-                <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm">
-                    <span class="text-white text-sm font-bold">{{ active_events|length }}</span>
-                </div>
+        <!-- Сайдбар (Список) -->
+        <div class="col-span-1 border-r dark:border-gray-700 flex flex-col h-full overflow-hidden bg-white dark:bg-gray-900 z-20 relative">
+            <div class="p-3 bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-700 font-bold text-xs uppercase text-gray-500 dark:text-gray-400 flex justify-between">
+                <span>Лента событий</span>
+                <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 rounded">{{ active_events|length }}</span>
             </div>
-
-            <!-- Лента событий -->
-            <div id="events-list" class="flex-1 overflow-y-auto p-3 space-y-3" style="max-height: 100%;">
+            <div id="events-list" class="flex-1 overflow-y-auto p-2 space-y-2">
                 {% for event in active_events %}
-                <div id="event-{{ event.event_uid }}"
-                     class="group relative overflow-hidden rounded-xl border-l-4 border-red-500 bg-gradient-to-r from-red-50 to-white hover:from-red-100 hover:to-red-50 cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                     onclick="focusMap({{ event.latlon.y|stringformat:'f' }}, {{ event.latlon.x|stringformat:'f' }})">
-
-                    <!-- Контент карточки -->
-                    <div class="p-4">
-                        <!-- Заголовок -->
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="p-1.5 rounded-lg bg-red-100">
-                                    <span class="material-symbols-outlined text-red-600 text-sm">warning</span>
-                                </div>
-                                <span class="text-xs font-bold text-red-700 uppercase tracking-wide">
-                                    {{ event.detected_type }}
-                                </span>
-                            </div>
-                            <span class="text-xs text-gray-400 font-mono">{{ event.timestamp|date:"H:i" }}</span>
-                        </div>
-
-                        <!-- Информация о пользователе -->
-                        <div class="mb-3">
-                            <div class="text-base font-bold text-gray-900 mb-1">
-                                {{ event.user.full_name|default:"Неизвестный пользователь" }}
-                            </div>
-                            <div class="flex items-center gap-2 text-sm text-gray-600">
-                                <span class="material-symbols-outlined text-xs">phone</span>
-                                {{ event.user.phone_number }}
-                            </div>
-                        </div>
-
-                        <!-- Футер -->
-                        <div class="flex items-center justify-between pt-3 border-t border-red-100">
-                            <div class="flex items-center gap-1 text-xs text-gray-500">
-                                <span class="material-symbols-outlined text-sm">location_on</span>
-                                <span>Координаты получены</span>
-                            </div>
-                            <div class="flex items-center gap-1 text-xs font-semibold text-red-600">
-                                <div class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
-                                <span>Активно</span>
-                            </div>
-                        </div>
+                <div id="event-card-{{ event.event_uid }}"
+                     class="p-3 rounded border-l-4 border-red-500 bg-gray-50 dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-gray-700 cursor-pointer border-t border-r border-b border-gray-200 dark:border-gray-700 shadow-sm transition-all"
+                     onclick="openDetails('{{ event.event_uid }}')">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-xs font-bold text-red-600">{{ event.detected_type }}</span>
+                        <span class="text-xs text-gray-400">{{ event.timestamp|date:"H:i" }}</span>
                     </div>
-
-                    <!-- Декоративный элемент -->
-                    <div class="absolute -right-6 -top-6 w-20 h-20 bg-red-500/10 rounded-full blur-2xl group-hover:bg-red-500/20 transition-all"></div>
+                    <div class="text-sm font-medium text-gray-900 dark:text-white mb-1">{{ event.user.full_name|default:"Пользователь" }}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ event.user.phone_number }}</div>
                 </div>
                 {% empty %}
-                <div class="flex flex-col items-center justify-center h-full p-8 text-center">
-                    <div class="p-6 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 mb-4">
-                        <span class="material-symbols-outlined text-green-600 text-5xl">check_circle</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-700 mb-2">Все спокойно</h3>
-                    <p class="text-sm text-gray-500">Нет активных вызовов</p>
-                </div>
+                <div class="p-4 text-center text-gray-400 text-sm flex flex-col items-center justify-center h-40">Нет активных вызовов</div>
                 {% endfor %}
             </div>
         </div>
 
-       <!-- Улучшенная карта -->
-        <div class="col-span-3 relative" style="background: #f8fafc;">
-            <!-- Плейсхолдер с анимацией -->
-            <div id="map-placeholder" class="absolute inset-0 flex flex-col items-center justify-center z-0" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);">
-                <div class="relative">
-                    <div class="absolute inset-0 bg-purple-500 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-                    <span class="relative material-symbols-outlined text-purple-600 text-6xl animate-bounce">map</span>
+        <!-- Карта и Панель Деталей -->
+        <div class="col-span-3 relative bg-gray-200 dark:bg-gray-800 overflow-hidden">
+            <div id="map" class="absolute inset-0 z-10" style="height: 100%; width: 100%;"></div>
+
+            <!-- ПАНЕЛЬ ДЕТАЛЕЙ (Скрыта по умолчанию) -->
+            <div id="details-panel" class="absolute top-0 right-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-30 border-l dark:border-gray-700 flex flex-col">
+                <!-- Шапка панели -->
+                <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center bg-red-50 dark:bg-red-900/20">
+                    <h2 class="font-bold text-red-700 dark:text-red-400">Детали инцидента</h2>
+                    <button onclick="closeDetails()" class="text-gray-500 hover:text-gray-800 dark:hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
                 </div>
-                <p class="text-gray-700 mt-4 text-lg font-medium">Загрузка карты...</p>
-            </div>
 
-            <!-- Контейнер карты -->
-            <div id="map" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; z-index: 10;"></div>
+                <!-- Контент панели -->
+                <div class="p-4 flex-1 overflow-y-auto space-y-4">
+                    <div>
+                        <label class="text-xs text-gray-500 uppercase font-bold">Тип угрозы</label>
+                        <div id="detail-type" class="text-lg font-bold text-gray-900 dark:text-white">-</div>
+                    </div>
 
-            <!-- Панель управления картой -->
-            <div class="absolute top-4 right-4 z-20 flex flex-col gap-2">
-                <button class="p-3 rounded-xl bg-white/95 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all group">
-                    <span class="material-symbols-outlined text-gray-700 group-hover:text-purple-600 transition-colors">my_location</span>
-                </button>
-                <button class="p-3 rounded-xl bg-white/95 backdrop-blur-md shadow-lg border border-gray-200 hover:bg-white transition-all group">
-                    <span class="material-symbols-outlined text-gray-700 group-hover:text-purple-600 transition-colors">layers</span>
-                </button>
+                    <div>
+                        <label class="text-xs text-gray-500 uppercase font-bold">Пользователь</label>
+                        <div id="detail-user" class="text-md text-gray-800 dark:text-gray-200">-</div>
+                        <div id="detail-phone" class="text-sm text-gray-500">-</div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
+                            <label class="text-[10px] text-gray-400 uppercase">Severity</label>
+                            <div id="detail-severity" class="font-bold">-</div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
+                            <label class="text-[10px] text-gray-400 uppercase">Time</label>
+                            <div id="detail-time" class="font-bold">-</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs text-gray-500 uppercase font-bold">Координаты</label>
+                        <div id="detail-coords" class="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded select-all">-</div>
+                    </div>
+
+                    <div class="pt-4 border-t dark:border-gray-700">
+                        <a id="detail-link" href="#" target="_blank" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">
+                            Открыть в админке
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
 <style>
-    /* Анимации */
-    @keyframes pulse-slow {
-        0%, 100% { opacity: 0.3; }
-        50% { opacity: 0.6; }
-    }
-
-    .animate-pulse-slow {
-        animation: pulse-slow 4s ease-in-out infinite;
-    }
-
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .animate-slideInRight {
-        animation: slideInRight 0.4s ease-out;
-    }
-
-    /* Градиентная сетка */
-    .bg-grid-white\/\[0\.05\] {
-        background-image:
-            linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    }
-
-    /* Фикс для Leaflet */
-    .leaflet-container img.leaflet-tile,
-    .leaflet-container img.leaflet-marker-icon,
-    .leaflet-container img.leaflet-marker-shadow {
-        max-width: none !important;
-        max-height: none !important;
-        width: auto !important;
-        height: auto !important;
-    }
-
-    .leaflet-pane,
-    .leaflet-tile,
-    .leaflet-marker-icon,
-    .leaflet-marker-shadow,
-    .leaflet-tile-container,
-    .leaflet-pane > svg,
-    .leaflet-pane > canvas,
-    .leaflet-zoom-box,
-    .leaflet-image-layer,
-    .leaflet-layer {
-        position: absolute !important;
-        left: 0;
-        top: 0;
-    }
-
-    /* Улучшенный маркер SOS */
-    .sos-marker {
-        background: transparent;
-        border: none;
-    }
-
-    .sos-marker-container {
-        position: relative;
-        width: 60px;
-        height: 60px;
-    }
-
-    .sos-marker-pulse {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle, rgba(239, 68, 68, 0.6) 0%, transparent 70%);
-        border-radius: 50%;
-        animation: sos-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    .sos-marker-dot {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 24px;
-        height: 24px;
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        border: 4px solid white;
-        border-radius: 50%;
-        box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5), 0 0 0 4px rgba(239, 68, 68, 0.2);
-    }
-
-    @keyframes sos-pulse {
-        0% {
-            transform: scale(0.5);
-            opacity: 1;
-        }
-        70%, 100% {
-            transform: scale(2.5);
-            opacity: 0;
-        }
-    }
-
-    /* Стили popup */
-    .leaflet-popup-content-wrapper {
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-    }
-
-    .leaflet-popup-tip {
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Scrollbar */
-    #events-list::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    #events-list::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    #events-list::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-    }
-
-    #events-list::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.3);
-    }
+    .leaflet-container img.leaflet-tile, .leaflet-container img.leaflet-marker-icon, .leaflet-container img.leaflet-marker-shadow { max-width: none !important; max-height: none !important; width: auto !important; height: auto !important; }
+    .leaflet-pane, .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-tile-container, .leaflet-pane > svg, .leaflet-pane > canvas, .leaflet-zoom-box, .leaflet-image-layer, .leaflet-layer { position: absolute !important; left: 0; top: 0; }
+    .sos-marker { background: transparent; border: none; }
+    .sos-marker::before { content: ''; position: absolute; left: -10px; top: -10px; width: 40px; height: 40px; background-color: rgba(239, 68, 68, 0.5); border-radius: 50%; animation: pulse-ring 1.5s infinite; }
+    .sos-marker::after { content: ''; position: absolute; left: 0; top: 0; width: 20px; height: 20px; background-color: #ef4444; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.3); }
+    @keyframes pulse-ring { 0% { transform: scale(0.33); opacity: 1; } 80%, 100% { transform: scale(2); opacity: 0; } }
 </style>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+    // Хранилище данных событий на клиенте
+    const eventsData = {};
+
+    // Заполняем данными при загрузке (из Django)
+    {% for event in active_events %}
+        eventsData['{{ event.event_uid }}'] = {
+            uid: '{{ event.event_uid }}',
+            id: '{{ event.id }}',
+            type: '{{ event.detected_type }}',
+            user: '{{ event.user.full_name|default:"Пользователь" }}',
+            phone: '{{ event.user.phone_number }}',
+            lat: {{ event.latlon.y|stringformat:'f' }},
+            lon: {{ event.latlon.x|stringformat:'f' }},
+            time: '{{ event.timestamp|date:"H:i:s" }}',
+            severity: {{ event.severity }}
+        };
+    {% endfor %}
+
     document.addEventListener("DOMContentLoaded", function() {
-        console.log("🚀 Live Monitor Init...");
+        const map = L.map('map').setView([41.311, 69.240], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(map);
+        setTimeout(() => { map.invalidateSize(); }, 300);
 
-        // Инициализация карты
-        const mapEl = document.getElementById('map');
-        if (!mapEl) return;
-
-        // Проверяем размеры контейнера
-        console.log('Map container:', mapEl.offsetWidth, 'x', mapEl.offsetHeight);
-
-        const map = L.map('map', {
-            zoomControl: true,
-            preferCanvas: false,
-            scrollWheelZoom: true
-        }).setView([41.311, 69.240], 12);
-
-        // Светлая карта для светлой темы
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
-            maxZoom: 19
-        }).addTo(map);
-
-        setTimeout(() => {
-            map.invalidateSize();
-            const placeholder = document.getElementById('map-placeholder');
-            if (placeholder) {
-                placeholder.style.display = 'none';
-            }
-            console.log('Map initialized');
-        }, 300);
-
-        const sosIcon = L.divIcon({
-            className: 'sos-marker',
-            html: `
-                <div class="sos-marker-container">
-                    <div class="sos-marker-pulse"></div>
-                    <div class="sos-marker-pulse" style="animation-delay: 0.5s;"></div>
-                    <div class="sos-marker-dot"></div>
-                </div>
-            `,
-            iconSize: [60, 60],
-            iconAnchor: [30, 30],
-            popupAnchor: [0, -30]
-        });
-
+        const sosIcon = L.divIcon({ className: 'sos-marker', iconSize: [20, 20], iconAnchor: [10, 10] });
         const markers = {};
 
-        // Функция добавления маркера с анимацией
+        // Функция открытия панели
+        window.openDetails = function(uid) {
+            const data = eventsData[uid];
+            if (!data) return;
+
+            // 1. Фокус карты
+            map.flyTo([data.lat, data.lon], 16, { duration: 1.0 });
+
+            // 2. Заполнение панели
+            document.getElementById('detail-type').textContent = data.type;
+            document.getElementById('detail-user').textContent = data.user;
+            document.getElementById('detail-phone').textContent = data.phone;
+            document.getElementById('detail-severity').textContent = data.severity;
+            document.getElementById('detail-time').textContent = data.time;
+            document.getElementById('detail-coords').textContent = `${data.lat.toFixed(5)}, ${data.lon.toFixed(5)}`;
+            document.getElementById('detail-link').href = `/admin/sos/sosevent/${data.id}/change/`;
+
+            // 3. Показ панели (убираем класс сдвига)
+            document.getElementById('details-panel').classList.remove('translate-x-full');
+        };
+
+        window.closeDetails = function() {
+            document.getElementById('details-panel').classList.add('translate-x-full');
+        };
+
         window.addMarker = function(event) {
             if (markers[event.event_uid]) return;
 
-            const marker = L.marker([event.lat, event.lon], {icon: sosIcon})
-                .addTo(map)
-                .bindPopup(`
-                    <div class="p-4 min-w-[280px] bg-gradient-to-br from-white to-gray-50">
-                        <div class="flex items-center gap-3 mb-4 pb-3 border-b border-gray-200">
-                            <div class="p-2 rounded-lg bg-red-100">
-                                <span class="material-symbols-outlined text-red-600 text-xl">emergency</span>
-                            </div>
-                            <div>
-                                <div class="font-bold text-red-600 text-sm uppercase tracking-wide">
-                                    ${event.detected_type}
-                                </div>
-                                <div class="text-xs text-gray-500 mt-1">Активный вызов</div>
-                            </div>
-                        </div>
-                        <div class="space-y-2 mb-4">
-                            <div class="flex items-center gap-2 text-sm text-gray-700">
-                                <span class="material-symbols-outlined text-base">person</span>
-                                <span class="font-semibold">${event.user_phone}</span>
-                            </div>
-                            <div class="flex items-center gap-2 text-xs text-gray-500">
-                                <span class="material-symbols-outlined text-sm">schedule</span>
-                                <span>Только что</span>
-                            </div>
-                        </div>
-                        <a href="/admin/sos/sosevent/${event.id}/change/"
-                           target="_blank"
-                           class="block w-full py-2.5 px-4 text-center bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold rounded-lg hover:from-red-700 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl">
-                            <span class="flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined text-sm">open_in_new</span>
-                                Открыть детали
-                            </span>
-                        </a>
-                    </div>
-                `);
+            // Сохраняем в локальное хранилище
+            eventsData[event.event_uid] = {
+                uid: event.event_uid,
+                id: event.id, // ID может не прийти в payload, если не настроен сериализатор, но пока не критично
+                type: event.detected_type,
+                user: event.user_phone, // В payload приходит user_phone
+                phone: event.user_phone,
+                lat: event.lat,
+                lon: event.lon,
+                time: new Date().toLocaleTimeString(),
+                severity: event.severity
+            };
 
+            const marker = L.marker([event.lat, event.lon], {icon: sosIcon}).addTo(map);
+            // При клике на маркер открываем панель
+            marker.on('click', () => openDetails(event.event_uid));
             markers[event.event_uid] = true;
 
-            // Обновление списка с анимацией
+            // Обновление списка
             const list = document.getElementById('events-list');
-            const emptyMsg = list.querySelector('.flex.flex-col.items-center');
-            if(emptyMsg) emptyMsg.remove();
-
             const item = document.createElement('div');
-            item.className = "group relative overflow-hidden rounded-xl border-l-4 border-red-500 bg-gradient-to-r from-red-50 to-white cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 mb-3 animate-slideInRight";
+            item.id = `event-card-${event.event_uid}`;
+            item.className = "p-3 rounded border-l-4 border-red-500 bg-red-50 hover:bg-red-100 cursor-pointer border-t border-r border-b border-red-200 mb-2 animate-pulse";
             item.innerHTML = `
-                <div class="p-4">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-2">
-                            <div class="p-1.5 rounded-lg bg-red-100 animate-pulse">
-                                <span class="material-symbols-outlined text-red-600 text-sm">emergency</span>
-                            </div>
-                            <span class="text-xs font-bold text-red-700 uppercase tracking-wide">
-                                NEW: ${event.detected_type}
-                            </span>
-                        </div>
-                        <span class="text-xs text-gray-400 font-mono">Сейчас</span>
-                    </div>
-                    <div class="text-base font-bold text-gray-900 mb-1">${event.user_phone}</div>
-                    <div class="flex items-center justify-between pt-3 border-t border-red-100">
-                        <div class="flex items-center gap-1 text-xs text-gray-500">
-                            <span class="material-symbols-outlined text-sm">location_on</span>
-                            <span>Координаты получены</span>
-                        </div>
-                        <div class="flex items-center gap-1 text-xs font-semibold text-red-600">
-                            <div class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
-                            <span>Активно</span>
-                        </div>
-                    </div>
+                <div class="flex justify-between items-start mb-1">
+                    <span class="text-xs font-bold text-red-600">NEW: ${event.detected_type}</span>
+                    <span class="text-xs text-gray-500">Just now</span>
                 </div>
+                <div class="text-sm font-medium text-gray-900">${event.user_phone}</div>
             `;
-            item.onclick = () => map.flyTo([event.lat, event.lon], 16, { duration: 1.5 });
+            item.onclick = () => openDetails(event.event_uid);
             list.prepend(item);
 
-            // Звуковое уведомление
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
+            // Звук
+            try { new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); } catch(e) {}
 
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-
-                oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-
-                oscillator.start();
-                oscillator.stop(audioContext.currentTime + 0.5);
-            } catch(e) {
-                console.warn('Audio notification failed:', e);
-            }
-
-            map.flyTo([event.lat, event.lon], 16, { duration: 1.5 });
+            openDetails(event.event_uid);
         };
 
-        window.focusMap = function(lat, lon) {
-            map.flyTo([lat, lon], 16, { duration: 1.5, easeLinearity: 0.25 });
-        };
+        // Рендеринг существующих
+        Object.values(eventsData).forEach(data => {
+            const marker = L.marker([data.lat, data.lon], {icon: sosIcon}).addTo(map);
+            marker.on('click', () => openDetails(data.uid));
+            markers[data.uid] = true;
+        });
 
-        // Рендеринг существующих событий
-        {% for event in active_events %}
-            L.marker(
-                [{{ event.latlon.y|stringformat:'f' }}, {{ event.latlon.x|stringformat:'f' }}],
-                {icon: sosIcon}
-            ).addTo(map).bindPopup(`
-                <div class="p-4 min-w-[280px] bg-gradient-to-br from-white to-gray-50">
-                    <div class="flex items-center gap-3 mb-4 pb-3 border-b border-gray-200">
-                        <div class="p-2 rounded-lg bg-red-100">
-                            <span class="material-symbols-outlined text-red-600 text-xl">emergency</span>
-                        </div>
-                        <div>
-                            <div class="font-bold text-red-600 text-sm uppercase tracking-wide">
-                                {{ event.detected_type }}
-                            </div>
-                            <div class="text-xs text-gray-500 mt-1">Активный вызов</div>
-                        </div>
-                    </div>
-                    <div class="space-y-2 mb-4">
-                        <div class="flex items-center gap-2 text-sm text-gray-700">
-                            <span class="material-symbols-outlined text-base">person</span>
-                            <span class="font-semibold">{{ event.user.phone_number }}</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-xs text-gray-500">
-                            <span class="material-symbols-outlined text-sm">schedule</span>
-                            <span>{{ event.timestamp|date:"H:i" }}</span>
-                        </div>
-                    </div>
-                    <a href="/admin/sos/sosevent/{{ event.id }}/change/"
-                       target="_blank"
-                       class="block w-full py-2.5 px-4 text-center bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold rounded-lg hover:from-red-700 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl">
-                        <span class="flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined text-sm">open_in_new</span>
-                            Открыть детали
-                        </span>
-                    </a>
-                </div>
-            `);
-            markers['{{ event.event_uid }}'] = true;
-        {% endfor %}
-
-        // WebSocket подключение
+        // WebSocket
         const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         const wsUrl = protocol + window.location.host + '/ws/sos_events/';
         const statusDiv = document.getElementById('connection-status');
-        const lastUpdateDiv = document.getElementById('last-update');
-
-        let socket;
+        const pingDot = document.getElementById('ping-dot');
 
         function connectWs() {
-            socket = new WebSocket(wsUrl);
-
+            const socket = new WebSocket(wsUrl);
             socket.onopen = () => {
-                console.log('✅ WebSocket connected');
-                statusDiv.innerHTML = `
-                    <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                    <span class="text-xs font-bold text-green-100">ONLINE</span>
-                `;
-                statusDiv.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/20 backdrop-blur-md border border-green-400/30";
+                statusDiv.textContent = "ONLINE";
+                statusDiv.className = "px-3 py-1 rounded text-xs font-bold bg-green-100 text-green-800 border border-green-200";
+                pingDot.classList.remove('hidden');
             };
-
             socket.onmessage = (e) => {
                 const data = JSON.parse(e.data);
-                console.log('📨 Received:', data);
-
-                if (data.type === 'sos_event') {
-                    addMarker(data.payload);
-
-                    const now = new Date();
-                    lastUpdateDiv.innerHTML = `
-                        <span class="material-symbols-outlined text-white text-sm">schedule</span>
-                        <span class="text-xs text-white font-mono">
-                            ${now.toLocaleTimeString('ru-RU')}
-                        </span>
-                    `;
-                }
+                if (data.type === 'sos_event') addMarker(data.payload);
             };
-
-            socket.onerror = (error) => {
-                console.error('❌ WebSocket error:', error);
-            };
-
             socket.onclose = () => {
-                console.log('⚠️ WebSocket disconnected');
-                statusDiv.innerHTML = `
-                    <div class="w-2 h-2 rounded-full bg-red-400"></div>
-                    <span class="text-xs font-bold text-red-100">OFFLINE</span>
-                `;
-                statusDiv.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 backdrop-blur-md border border-red-400/30";
-
+                statusDiv.textContent = "OFFLINE";
+                statusDiv.className = "px-3 py-1 rounded text-xs font-bold bg-red-100 text-red-800 border border-red-200";
+                pingDot.classList.add('hidden');
                 setTimeout(connectWs, 3000);
             };
         }
-
         connectWs();
     });
 </script>

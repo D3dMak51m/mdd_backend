@@ -1,12 +1,7 @@
-import React from 'react';
-import Sidebar from '../components/Sidebar';
-import MapWorkspace from '../components/MapWorkspace';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <main className="flex h-screen w-full overflow-hidden bg-ops-bg text-white">
-      <Sidebar />
-      <MapWorkspace />
-    </main>
-  );
+  // Next.js автоматически добавит basePath (/ops),
+  // поэтому редирект на '/live' приведет пользователя на '/ops/live'
+  redirect('/live');
 }
