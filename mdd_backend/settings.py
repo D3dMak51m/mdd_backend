@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',  # GeoDjango
+    'django.contrib.gis',
+    'django_filters',
 
     # Сторонние приложения
     'rest_framework',
@@ -73,7 +74,11 @@ INSTALLED_APPS = [
 CELERY_BEAT_SCHEDULE = {
     'aggregate-stats-every-hour': {
         'task': 'apps.analytics.tasks.aggregate_daily_stats_task',
-        'schedule': 3600.0, # Раз в час (или используйте crontab для запуска ночью)
+        'schedule': 3600.0,
+    },
+    'check-device-heartbeats-every-minute': {
+        'task': 'apps.devices.tasks.check_device_heartbeats',
+        'schedule': 60.0,  # Запускаем каждую минуту
     },
 }
 

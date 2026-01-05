@@ -1,6 +1,6 @@
 # apps/devices/admin.py
-
 from django.contrib import admin
+from django.utils import timezone
 from django.utils.html import format_html
 from django.urls import reverse  # <-- ДОБАВЛЕН ЭТОТ ИМПОРТ
 from unfold.admin import ModelAdmin
@@ -11,10 +11,31 @@ from .models import Device, LocationTrack
 @admin.register(Device)
 class DeviceAdmin(ModelAdmin):
     # Добавили 'history_link' в list_display
-    list_display = ('device_uid', 'model_badge', 'owner_link', 'battery_bar', 'status_badge', 'last_update',
-                    'history_link')
+    list_display = ('device_uid', 'model_badge', 'owner_link', 'battery_bar', 'status_badge', 'last_update', 'history_link')
     search_fields = ('device_uid', 'owner__phone_number', 'owner__full_name')
     list_filter = ('is_online', 'model', 'last_seen_via')
+
+    @display(description="Last Seen", ordering="last_update")
+    def last_seen_formatted(self, obj):
+        if not obj.last_update:
+            return "-"
+
+        now = timezone.now()
+        diff = now - obj.last_update
+
+        # Если прошло меньше 10 минут - зеленый текст
+        if diff.total_seconds() < 600:
+            color = "text-green-600"
+        # Если меньше часа - оранжевый
+        elif diff.total_seconds() < 3600:
+            color = "text-orange-500"
+        # Иначе - красный (давно не было)
+        else:
+            color = "text-red-500"
+
+        return format_html(
+            f'<span class="{color} font-medium">{obj.last_update.strftime("%d.%m %H:%M")}</span>'
+        )
 
     @display(description="Model", label=True)
     def model_badge(self, obj):
