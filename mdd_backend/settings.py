@@ -80,6 +80,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'apps.devices.tasks.check_device_heartbeats',
         'schedule': 60.0,  # Запускаем каждую минуту
     },
+    'cleanup-old-data-daily': {
+        'task': 'apps.monitoring.tasks.cleanup_old_data',
+        'schedule': 86400.0,  # Раз в сутки
+    },
 }
 
 UNFOLD = {
