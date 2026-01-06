@@ -1,6 +1,7 @@
 'use client';
 
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import { useIncidentStore } from '@/shared/stores/incident-store';
 import { useEffect } from 'react';
@@ -22,6 +23,17 @@ const redIcon = L.divIcon({
   iconAnchor: [8, 8],
 });
 
+// Функция для создания красивой иконки кластера
+const createClusterCustomIcon = function (cluster: any) {
+  return L.divIcon({
+    html: `<div class="flex items-center justify-center w-full h-full bg-slate-800 border-2 border-slate-600 rounded-full text-white font-bold shadow-xl">
+            ${cluster.getChildCount()}
+           </div>`,
+    className: 'custom-marker-cluster',
+    iconSize: L.point(33, 33, true),
+  });
+};
+
 // Компонент для управления зумом при выборе инцидента
 function MapController() {
   const map = useMap();
@@ -35,7 +47,6 @@ function MapController() {
       }
     }
   }, [activeIncidentId, incidents, map]);
-
   return null;
 }
 
@@ -52,30 +63,42 @@ export default function LiveMap() {
       <TileLayer
         attribution='&copy; OpenStreetMap contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        // Темная карта (CSS фильтр)
         className="map-tiles-dark"
       />
 
       <MapController />
 
-      {incidents.map((incident) => (
-        <Marker
-          key={incident.event_uid}
-          position={[incident.lat, incident.lon]}
-          icon={redIcon}
-          eventHandlers={{
-            click: () => setActiveIncidentId(incident.event_uid),
-          }}
-        >
-          <Popup className="custom-popup">
-            <div className="text-slate-900">
-              <strong className="text-red-600">{incident.detected_type}</strong>
-              <br />
-              {incident.user.phone_number}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      {/* Оборачиваем маркеры в кластер */}
+      <MarkerClusterGroup
+        chunkedLoading
+        iconCreateFunction={createClusterCustomIcon}
+        spiderfyOnMaxZoom={true}
+        showCoverageOnHover={false}
+      >
+        {incidents.map((incident) => (
+          <Marker
+            key={incident.event_uid}
+            position={[incident.lat, incident.lon]}
+            icon={redIcon}
+            eventHandlers={{
+              click: () => setActiveIncidentId(incident.event_uid),
+            }}
+          >
+            <Popup className="custom-popup">
+              <div className="text-slate-900 min-w-[150px]">
+                <div className="flex justify-between items-center mb-2">
+                    <strong className="text-red-600 text-sm">{incident.detected_type}</strong>
+                    <span className="text-xs bg-slate-200 px-1 rounded">Sev: {incident.severity}</span>
+                </div>
+                <div className="text-sm font-medium">{incident.user.phone_number}</div>
+                <div className="text-xs text-slate-500 mt-1">
+                    {new Date(incident.timestamp).toLocaleTimeString()}
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MarkerClusterGroup>
     </MapContainer>
   );
 }
