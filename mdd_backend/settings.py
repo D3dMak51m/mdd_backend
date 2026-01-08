@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',  # GeoDjango
+    'django.contrib.gis',
+    'django_filters',
 
     # Сторонние приложения
     'rest_framework',
@@ -64,113 +65,36 @@ INSTALLED_APPS = [
     'apps.sos',
     'apps.notifications',
     'apps.monitoring',
+    'apps.rbac',
+    'apps.audit',
+    'apps.analytics',
 ]
 
+# Расписание периодических задач
+CELERY_BEAT_SCHEDULE = {
+    'aggregate-stats-every-hour': {
+        'task': 'apps.analytics.tasks.aggregate_daily_stats_task',
+        'schedule': 3600.0,
+    },
+    'check-device-heartbeats-every-minute': {
+        'task': 'apps.devices.tasks.check_device_heartbeats',
+        'schedule': 60.0,  # Запускаем каждую минуту
+    },
+    'cleanup-old-data-daily': {
+        'task': 'apps.monitoring.tasks.cleanup_old_data',
+        'schedule': 86400.0,  # Раз в сутки
+    },
+}
+
 UNFOLD = {
-    "SITE_TITLE": "MDD Dispatcher",
-    "SITE_HEADER": "Man Down Detection Platform",
+    "SITE_TITLE": "MDD Admin",
+    "SITE_HEADER": "Man Down Detection",
     "SITE_URL": "/",
 
-    # Подключаем кастомные стили и скрипты
-    "STYLES": [
-        lambda request: static("css/admin_custom.css"),
-        # Google Material Symbols Icons
-        "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200",
-    ],
-    "SCRIPTS": [
-        lambda request: static("js/admin_custom.js"),
-    ],
-
-    # Современная цветовая палитра (Violet/Purple)
-    "COLORS": {
-        "primary": {
-            "50": "250 245 255",
-            "100": "243 232 255",
-            "200": "233 213 255",
-            "300": "216 180 254",
-            "400": "192 132 252",
-            "500": "168 85 247",
-            "600": "147 51 234",
-            "700": "126 34 206",
-            "800": "107 33 168",
-            "900": "88 28 135",
-            "950": "59 7 100",
-        },
-    },
-
-    # Настройка сайдбара
     "SIDEBAR": {
         "show_search": True,
-        "show_all_applications": False,
-        "navigation": [
-            {
-                "title": "Оперативный центр",
-                "separator": True,
-                "collapsible": False,
-                "items": [
-                    {
-                        "title": "Главный Дашборд",
-                        "icon": "dashboard",
-                        "link": reverse_lazy("admin:index"),
-                    },
-                    {
-                        "title": "Live Мониторинг",
-                        "icon": "emergency",
-                        "link": reverse_lazy("live-monitor"),
-                        "badge": "apps.monitoring.dashboard.badge_active_sos",
-                    },
-                ],
-            },
-            {
-                "title": "Управление",
-                "separator": True,
-                "collapsible": False,
-                "items": [
-                    {
-                        "title": "SOS Сигналы",
-                        "icon": "notifications_active",
-                        "link": reverse_lazy("admin:sos_sosevent_changelist"),
-                        "badge": "apps.monitoring.dashboard.badge_active_sos",
-                    },
-                    {
-                        "title": "Устройства",
-                        "icon": "watch",
-                        "link": reverse_lazy("admin:devices_device_changelist"),
-                    },
-                    {
-                        "title": "Пользователи",
-                        "icon": "people",
-                        "link": reverse_lazy("admin:users_user_changelist"),
-                    },
-                ],
-            },
-            {
-                "title": "Система",
-                "separator": True,
-                "collapsible": True,
-                "items": [
-                    {
-                        "title": "Настройки",
-                        "icon": "settings",
-                        "link": reverse_lazy("admin:monitoring_settingsconfig_changelist"),
-                    },
-                    {
-                        "title": "Метрики",
-                        "icon": "analytics",
-                        "link": "/metrics/",
-                    },
-                    {
-                        "title": "API Документация",
-                        "icon": "code",
-                        "link": "/swagger/",
-                    },
-                ],
-            },
-        ],
+        "show_all_applications": True,  # Показывает ВСЕ модели автоматически
     },
-
-    # Callback для дашборда
-    "DASHBOARD_CALLBACK": "apps.monitoring.dashboard.dashboard_callback",
 }
 
 MIDDLEWARE = [

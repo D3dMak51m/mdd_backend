@@ -41,7 +41,7 @@ def dashboard_callback(request, context):
     # Формируем карточки KPI с градиентами
     kpi = [
         {
-            "title": "АКТИВНЫЕ ТРЕВОГИ",
+            "title": "АКТИВНЫыЕ ТРЕВОГИ",
             "metric": active_sos_count,
             "footer": "Требуют реакции",
             "footer_icon": "warning",
@@ -188,3 +188,22 @@ def dashboard_callback(request, context):
     })
 
     return context
+
+# apps/monitoring/dashboard.py
+
+# from apps.sos.models import SOSEvent
+#
+#
+# def badge_active_sos(request):
+#     """
+#     Возвращает количество активных (нерешенных) SOS-сигналов
+#     для отображения в красном бейдже в боковом меню.
+#     """
+#     return SOSEvent.objects.filter(resolved=False).count()
+#
+#
+# def dashboard_callback(request, context):
+#     """
+#     Базовый dashboard без кастомизации.
+#     """
+#     return context

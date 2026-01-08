@@ -16,3 +16,4 @@ firebase-admin==7.1.0
 twilio==9.8.4
 honcho==2.0.0
 django-unfold==0.72.0
+django-filter==25.2
