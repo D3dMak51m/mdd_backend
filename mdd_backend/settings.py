@@ -200,7 +200,8 @@ SIMPLE_JWT = {
 }
 
 # CORS
-CORS_ALLOW_ORIGINS = []  # Для разработки. В продакшене заменить на CORS_ALLOWED_ORIGINS
+# Render dashboard origin must be added to CORS_ALLOWED_ORIGINS in backend environment.
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['http://localhost', 'http://localhost:3000'])
 CORS_ALLOW_CREDENTIALS = True
 
 # Celery
