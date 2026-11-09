@@ -204,8 +204,16 @@ CORS_ALLOW_ORIGINS = []  # Для разработки. В продакшене 
 CORS_ALLOW_CREDENTIALS = True
 
 # Celery
-CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://redis:6379/0')
-CELERY_RESULT_BACKEND = env('CELERY_BROKER_URL')  # Можно использовать тот же Redis
+# CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://redis:6379/0')
+CELERY_BROKER_URL = env(
+    'CELERY_BROKER_URL',
+    default='redis://redis:6379/0'
+)
+# CELERY_RESULT_BACKEND = env('CELERY_BROKER_URL')  # Можно использовать тот же Redis
+CELERY_RESULT_BACKEND = env(
+    'CELERY_RESULT_BACKEND',
+    default=CELERY_BROKER_URL
+)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -220,6 +228,18 @@ CHANNEL_LAYERS = {
             "hosts": [env('CACHE_URL', default='redis://redis:6379/1')],
         },
     },
+}
+
+# Django Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": env("CACHE_URL", default="redis://redis:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "TIMEOUT": 86400,
+    }
 }
 
 # Sentry
