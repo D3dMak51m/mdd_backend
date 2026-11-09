@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = '/api/v1';
+const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') ?? '';
+const API_URL = `${API_ORIGIN}/api/v1`;
 
 export const apiClient = axios.create({
   baseURL: API_URL,
@@ -43,7 +44,6 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/')) {
 
       if (isRefreshing) {
-        // Если уже обновляем, добавляем запрос в очередь
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         })
@@ -75,10 +75,9 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        // Полный выход
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        if (typeof window !== 'undefined') window.location.href = '/ops/login';
+        if (typeof window !== 'undefined') window.location.href = '/login';
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
