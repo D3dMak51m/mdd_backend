@@ -9,6 +9,9 @@ RUN npm ci
 # 2. Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Render exposes service environment variables as Docker build args.
+ARG NEXT_PUBLIC_API_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Next.js collects completely static pages
