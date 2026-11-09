@@ -3,7 +3,6 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
-
 from .models import SOSEvent
 from apps.devices.models import Device
 from apps.notifications.models import NotificationLog
@@ -14,6 +13,7 @@ from apps.notifications.services import send_fcm_push
 from ..users.models import User
 
 logger = get_task_logger(__name__)
+
 
 @shared_task
 def notify_status_change(sos_id, responder_id):
@@ -64,6 +64,7 @@ def notify_status_change(sos_id, responder_id):
                 )
             except Exception:
                 continue
+
 
 @shared_task
 def notify_nearby_helpers(sos_id):
@@ -118,11 +119,47 @@ def notify_nearby_helpers(sos_id):
     logger.info(f"Создано {len(logs_created)} уведомлений для SOS ID: {sos_id}.")
     return f"Создано {len(logs_created)} уведомлений."
 
+
 @shared_task
 def escalation_watch(sos_id):
     """
-    Проверяет, было ли событие обработано, и эскалирует его при необходимости.
+    Проверяет, был ли принят вызов. Если нет — эскалирует (уведомляет админов).
     """
-    logger.info(f"Запущена задача escalation_watch для SOS ID: {sos_id}")
-    # Логика будет добавлена позже
-    return f"Проверка эскалации для SOS ID {sos_id} завершена."
+    try:
+        event = SOSEvent.objects.get(id=sos_id)
+    except SOSEvent.DoesNotExist:
+        return
+
+    # Если событие уже принято или решено — ничего не делаем
+    if event.status != SOSEvent.Status.NEW:
+        logger.info(f"SOS {sos_id} уже обработан (Статус: {event.status}). Эскалация не требуется.")
+        return
+
+    logger.warning(f"SOS {sos_id} не принят в течение тайм-аута! Эскалация.")
+
+    # 1. Находим всех админов/диспетчеров
+    admins = User.objects.filter(role=User.Role.ADMIN, fcm_token__isnull=False)
+
+    # 2. Отправляем им критическое уведомление
+    count = 0
+    for admin in admins:
+        try:
+            send_fcm_push(
+                token=admin.fcm_token,
+                title="⚠️ ЭСКАЛАЦИЯ SOS!",
+                body=f"Инцидент {event.event_uid} не принят уже 5 минут! Требуется вмешательство.",
+                data={
+                    "type": "SOS_ESCALATION",
+                    "sos_id": str(event.event_uid)
+                }
+            )
+            count += 1
+        except Exception:
+            pass
+
+    # 3. Можно также повысить severity в базе
+    if event.severity < 5:
+        event.severity = 5
+        event.save(update_fields=['severity'])
+
+    return f"Эскалация выполнена. Уведомлено {count} админов."

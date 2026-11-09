@@ -32,6 +32,8 @@ urlpatterns = [
         path('devices/', include('apps.devices.urls')),
         path('sos/', include('apps.sos.urls')),
         path('monitoring/', include('apps.monitoring.urls')),
+        path('analytics/', include('apps.analytics.urls')),
+        path('audit/', include('apps.audit.urls')),
     ])),
 
     # Документация API

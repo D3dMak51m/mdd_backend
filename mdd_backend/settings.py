@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',  # GeoDjango
+    'django.contrib.gis',
+    'django_filters',
 
     # Сторонние приложения
     'rest_framework',
@@ -64,113 +65,36 @@ INSTALLED_APPS = [
     'apps.sos',
     'apps.notifications',
     'apps.monitoring',
+    'apps.rbac',
+    'apps.audit',
+    'apps.analytics',
 ]
 
+# Расписание периодических задач
+CELERY_BEAT_SCHEDULE = {
+    'aggregate-stats-every-hour': {
+        'task': 'apps.analytics.tasks.aggregate_daily_stats_task',
+        'schedule': 3600.0,
+    },
+    'check-device-heartbeats-every-minute': {
+        'task': 'apps.devices.tasks.check_device_heartbeats',
+        'schedule': 60.0,  # Запускаем каждую минуту
+    },
+    'cleanup-old-data-daily': {
+        'task': 'apps.monitoring.tasks.cleanup_old_data',
+        'schedule': 86400.0,  # Раз в сутки
+    },
+}
+
 UNFOLD = {
-    "SITE_TITLE": "MDD Dispatcher",
-    "SITE_HEADER": "Man Down Detection Platform",
+    "SITE_TITLE": "MDD Admin",
+    "SITE_HEADER": "Man Down Detection",
     "SITE_URL": "/",
 
-    # Подключаем кастомные стили и скрипты
-    "STYLES": [
-        lambda request: static("css/admin_custom.css"),
-        # Google Material Symbols Icons
-        "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200",
-    ],
-    "SCRIPTS": [
-        lambda request: static("js/admin_custom.js"),
-    ],
-
-    # Современная цветовая палитра (Violet/Purple)
-    "COLORS": {
-        "primary": {
-            "50": "250 245 255",
-            "100": "243 232 255",
-            "200": "233 213 255",
-            "300": "216 180 254",
-            "400": "192 132 252",
-            "500": "168 85 247",
-            "600": "147 51 234",
-            "700": "126 34 206",
-            "800": "107 33 168",
-            "900": "88 28 135",
-            "950": "59 7 100",
-        },
-    },
-
-    # Настройка сайдбара
     "SIDEBAR": {
         "show_search": True,
-        "show_all_applications": False,
-        "navigation": [
-            {
-                "title": "Оперативный центр",
-                "separator": True,
-                "collapsible": False,
-                "items": [
-                    {
-                        "title": "Главный Дашборд",
-                        "icon": "dashboard",
-                        "link": reverse_lazy("admin:index"),
-                    },
-                    {
-                        "title": "Live Мониторинг",
-                        "icon": "emergency",
-                        "link": reverse_lazy("live-monitor"),
-                        "badge": "apps.monitoring.dashboard.badge_active_sos",
-                    },
-                ],
-            },
-            {
-                "title": "Управление",
-                "separator": True,
-                "collapsible": False,
-                "items": [
-                    {
-                        "title": "SOS Сигналы",
-                        "icon": "notifications_active",
-                        "link": reverse_lazy("admin:sos_sosevent_changelist"),
-                        "badge": "apps.monitoring.dashboard.badge_active_sos",
-                    },
-                    {
-                        "title": "Устройства",
-                        "icon": "watch",
-                        "link": reverse_lazy("admin:devices_device_changelist"),
-                    },
-                    {
-                        "title": "Пользователи",
-                        "icon": "people",
-                        "link": reverse_lazy("admin:users_user_changelist"),
-                    },
-                ],
-            },
-            {
-                "title": "Система",
-                "separator": True,
-                "collapsible": True,
-                "items": [
-                    {
-                        "title": "Настройки",
-                        "icon": "settings",
-                        "link": reverse_lazy("admin:monitoring_settingsconfig_changelist"),
-                    },
-                    {
-                        "title": "Метрики",
-                        "icon": "analytics",
-                        "link": "/metrics/",
-                    },
-                    {
-                        "title": "API Документация",
-                        "icon": "code",
-                        "link": "/swagger/",
-                    },
-                ],
-            },
-        ],
+        "show_all_applications": True,  # Показывает ВСЕ модели автоматически
     },
-
-    # Callback для дашборда
-    "DASHBOARD_CALLBACK": "apps.monitoring.dashboard.dashboard_callback",
 }
 
 MIDDLEWARE = [
@@ -184,6 +108,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'mdd_backend.urls'
@@ -236,6 +161,15 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 # Тип первичного ключа по умолчанию
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -266,12 +200,21 @@ SIMPLE_JWT = {
 }
 
 # CORS
-CORS_ALLOW_ORIGINS = []  # Для разработки. В продакшене заменить на CORS_ALLOWED_ORIGINS
+# Render dashboard origin must be added to CORS_ALLOWED_ORIGINS in backend environment.
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['http://localhost', 'http://localhost:3000'])
 CORS_ALLOW_CREDENTIALS = True
 
 # Celery
-CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://redis:6379/0')
-CELERY_RESULT_BACKEND = env('CELERY_BROKER_URL')  # Можно использовать тот же Redis
+# CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://redis:6379/0')
+CELERY_BROKER_URL = env(
+    'CELERY_BROKER_URL',
+    default='redis://redis:6379/0'
+)
+# CELERY_RESULT_BACKEND = env('CELERY_BROKER_URL')  # Можно использовать тот же Redis
+CELERY_RESULT_BACKEND = env(
+    'CELERY_RESULT_BACKEND',
+    default=CELERY_BROKER_URL
+)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -286,6 +229,18 @@ CHANNEL_LAYERS = {
             "hosts": [env('CACHE_URL', default='redis://redis:6379/1')],
         },
     },
+}
+
+# Django Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": env("CACHE_URL", default="redis://redis:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "TIMEOUT": 86400,
+    }
 }
 
 # Sentry

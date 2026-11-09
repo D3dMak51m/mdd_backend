@@ -35,3 +35,7 @@ RUN if [ "$APP_ENV" = "dev" ]; then pip install --no-cache-dir -r requirements-d
 
 # Скопировать проект
 COPY . /app/
+
+EXPOSE 8000
+
+CMD ["sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput && exec uvicorn mdd_backend.asgi:application --host 0.0.0.0 --port ${PORT:-8000}"]
