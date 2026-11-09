@@ -1,4 +1,4 @@
-from django.db.models import Count, Avg, F, Q
+from django.db.models import Count, Avg, Case, DurationField, F, Q, When
 from django.utils import timezone
 from apps.sos.models import SOSEvent
 from .models import DailyIncidentStats
@@ -16,11 +16,29 @@ class AnalyticsService:
         # 1. Базовые счетчики
         aggregates = events.aggregate(
             total=Count('id'),
-            resolved=Count('id', filter=Q(status='RESOLVED')),
-            # Считаем среднее время от создания до принятия (accepted_at) или закрытия
+            # Support both fields because older/test records may have only one set.
+            resolved=Count(
+                'id',
+                filter=Q(resolved=True) | Q(status=SOSEvent.Status.RESOLVED)
+            ),
+            # Response time: incident creation -> dispatcher acceptance.
+            # For events resolved without acceptance, use creation -> resolution.
+            # Ignore negative durations caused by imported/backdated test records.
             avg_time=Avg(
-                F('resolved_at') - F('created_at'),
-                filter=Q(resolved_at__isnull=False)
+                Case(
+                    When(
+                        accepted_at__isnull=False,
+                        accepted_at__gte=F('created_at'),
+                        then=F('accepted_at') - F('created_at')
+                    ),
+                    When(
+                        accepted_at__isnull=True,
+                        resolved_at__isnull=False,
+                        resolved_at__gte=F('created_at'),
+                        then=F('resolved_at') - F('created_at')
+                    ),
+                    output_field=DurationField()
+                )
             )
         )
 
