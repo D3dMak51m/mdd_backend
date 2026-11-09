@@ -46,10 +46,13 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
         end_date = timezone.now().date()
         start_date = end_date - timedelta(days=6)
 
-        # Проверяем, есть ли статистика за сегодня, если нет - запускаем расчет
-        if not DailyIncidentStats.objects.filter(date=end_date).exists():
-            AnalyticsService.calculate_stats_for_day(end_date)
+        # Recalculate every day in the requested window. Existing rows may be stale
+        # after an incident is resolved or a manual SOS is created.
+        for day_offset in range(7):
+            AnalyticsService.calculate_stats_for_day(
+                start_date + timedelta(days=day_offset)
+            )
 
-        queryset = self.get_queryset().filter(date__range=[start_date, end_date])
+        queryset = self.get_queryset().filter(date__range=[start_date, end_date]).order_by('date')
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
