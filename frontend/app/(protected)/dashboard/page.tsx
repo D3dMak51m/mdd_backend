@@ -170,6 +170,9 @@ export default function DashboardPage() {
     const totalIncidents = stats.reduce((sum, s) => sum + s.total_incidents, 0);
     const totalResolved = stats.reduce((sum, s) => sum + s.resolved_count, 0);
     const avgResponseTime = stats.reduce((sum, s) => sum + s.avg_response_time_seconds, 0) / stats.length;
+    const avgResponseTimeLabel = avgResponseTime < 60
+        ? `${Math.round(avgResponseTime)}s`
+        : `${Math.round(avgResponseTime / 60)}m`;
     const todayIncidents = stats[stats.length - 1]?.total_incidents || 0;
 
     // Type distribution
@@ -351,28 +354,24 @@ export default function DashboardPage() {
                         value={totalIncidents}
                         icon={Activity}
                         color="red"
-                        trend={todayIncidents > 0 ? 5 : 0}
                     />
                     <KPICard
                         title="Resolved Cases"
                         value={totalResolved}
                         icon={CheckCircle}
                         color="green"
-                        trend={totalResolved > 0 ? 8 : 0}
                     />
                     <KPICard
                         title="Avg Response Time"
-                        value={`${Math.round(avgResponseTime / 60)}m`}
+                        value={avgResponseTimeLabel}
                         icon={Clock}
                         color="blue"
-                        trend={-2}
                     />
                     <KPICard
                         title="Today's Incidents"
                         value={todayIncidents}
                         icon={AlertTriangle}
                         color="yellow"
-                        trendValue="Today"
                     />
                 </div>
 
